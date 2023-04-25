@@ -9,17 +9,15 @@ import Chatbotfinish from './Chatbotfinish/Chatbotfinish';
 import CreateChatbotLast from './CreateChatbotLast/CreateChatbotLast';
 import { useDispatch, useSelector } from 'react-redux';
 import { TextField } from '@mui/material';
-import { createChatbot, updateChatbot, getChatbot } from '../redux/reducers/chatbotSlice';
 import { v4 as uuidv4 } from 'uuid';
-import ActionAlert from './Alert/ActionAlert';
 import messenger from '../assets/images/svg/messenger.svg'
 import instagram from '../assets/images/svg/instagram.png'
 import Topbar from './Topbar/Topbar';
-import CustomSwitch from './ui/IOSSwitch/IOSSwitch';
 import ListItem from './ui/ListItem';
 import LogoListItem from './ui/LogoListItem/LogoListItem';
 import FAQ from './FAQ/FAQ.';
 import MySnackbar from './ui/MySnackbar/MySnackbar';
+import { createChatbot, createChatBot, getChatbot, updateChatbot, updateChatBot } from '../redux/reducers/chatbotSlice';
 
 const Chatbot = () => {
   const [chatbotTab, setChatbotTab] = React.useState(1);
@@ -107,7 +105,7 @@ const Chatbot = () => {
   }
 
 
-  const createChatbot = () => {
+  const CreateChatbot = () => {
     console.log("createChatbot")
     const data = {
       userID: user?.user_id,
@@ -124,7 +122,7 @@ const Chatbot = () => {
     setSnackbarMessage('Created Successfully')
   }
 
-  const updateChatbot = () => {
+  const UpdateChatbot = () => {
     // console.log("update chatbot")
     setPrevTitle(chatbotTitle);
     // update here
@@ -224,9 +222,9 @@ const Chatbot = () => {
 
   const handleBlur = () => {
     if (chatbotID !== '') {
-      return updateChatbot()
+      return UpdateChatbot()
     }
-    return createChatbot()
+    return CreateChatbot()
   };
 
   const handleFocus = () => {
