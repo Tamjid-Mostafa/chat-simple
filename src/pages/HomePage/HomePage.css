@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;1,100;1,300;1,400;1,500&display=swap');
+.chat__simple__main{
+    @apply bg-gray-50 min-h-screen p-4;
+}
+
+.chat__simple__container{
+    @apply container mx-auto;
+}
+
+.chat__simple__container h1{
+    @apply text-3xl mb-2;
+    font-family: 'Roboto', sans-serif;
+}
+
+.chat__simple__container .small__two__connextios__row{
+    @apply flex items-center gap-4 mb-4;
+}
+
+.chat__simple__container .small__two__connextios__row span{
+    @apply text-sm;
+    font-family: 'Roboto', sans-serif;
+}
+
+.chat__simple__container .active__channel__row{
+    @apply flex items-center gap-4;
+}
+
+.chat__simple__container .two__box__messenger__row{
+    @apply flex items-center gap-8 mt-6;
+}
+.chat__simple__container .two__box__messenger__row .cards{
+    @apply block max-w-xs w-[262px] p-3 bg-white border border-gray-200 rounded-lg pb-4;
+}
+.chat__simple__container .two__box__messenger__row .cards .header{
+    @apply flex items-center justify-between;
+}
+.chat__simple__container .two__box__messenger__row .cards .header h4{
+    @apply text-lg;
+    font-family: 'Roboto', sans-serif;
+}
+
+.cards .bars__text{
+    @apply flex justify-between items-center pt-10;
+    font-family: 'Roboto', sans-serif;
+}
+
+.cards .bars__texts {
+    @apply flex justify-between items-center pt-4;
+}
+.cards .bars__texts span{
+    font-family: 'DM Sans', sans-serif!important;
+}
+
+/* Reports Text */
+.chat__simple__container .reports__hading{
+    @apply pt-10;
+}
+
+.chat__simple__container .reports__hading h3{
+    @apply text-xl;
+    font-family: 'Roboto', sans-serif;
+}
+
+.chat__simple__container .starts__date__end__date{
+    @apply bg-white w-[430px] h-12 border-b border-solid border-gray-400 rounded-none mt-3 flex items-center;
+}
+
+.starts__date__end__date .first__input{
+    @apply flex items-center;
+    font-family: 'Roboto', sans-serif;
+}
+
+.starts__date__end__date .first__input input {
+    @apply pl-3 outline-none border-none text-sm placeholder:text-black w-[160px];
+}
+
+.starts__date__end__date button{
+    @apply flex justify-center items-center ml-2;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* boxes__grid__sec */
+.boxes__grid__sec{
+    @apply grid grid-cols-2 gap-1 px-0 py-6 lg:py-8 md:grid-cols-4;
+}
+
+.boxes__grid__sec .card{
+    @apply bg-white border border-solid border-gray-300 p-4;
+    width: 262.75px;
+    height: 80px;
+}
+
+.boxes__grid__sec .card h6{
+    @apply text-sm text-gray-400;
+    font-family: 'Roboto', sans-serif;
+}
+.boxes__grid__sec .card h5{
+    @apply text-lg font-medium text-gray-800;
+    font-family: 'Roboto', sans-serif;
+}
+
+.boxes__grid__sec .percent{
+    @apply bg-[#EEF8F0] px-4 py-1 rounded-full text-sm;
+}
+
+/* grid__box__second */
+.grid__box__second{
+    @apply grid grid-cols-2 gap-8 px-0 py-6 lg:py-8 md:grid-cols-4;
+}
+
+.grid__box__second .cardss{
+    @apply bg-white border border-solid border-gray-300 p-4;
+    width: 259.5px;
+    height: 355px;
+}
+.grid__box__second .active__cardss{
+    @apply bg-white border border-solid border-gray-300 p-4;
+    width: 568px;
+    height: 355px;
+}
+.grid__box__second .active__cardss h6{
+    @apply text-lg font-medium;
+    font-family: 'Roboto', sans-serif;
+}
+
+.grid__box__second .cardss h6{
+    @apply text-lg font-medium;
+    font-family: 'Roboto', sans-serif;
+}

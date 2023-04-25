@@ -1,0 +1,147 @@
+.aboutUs,
+.chatSimple,
+.home {
+  position: absolute;
+  top: 86px;
+}
+
+.home {
+  left: 804px;
+}
+
+.aboutUs {
+  left: 922px;
+}
+
+.chatSimple {
+  left: 86px;
+  font-size: 32px;
+  color: #ACFF00;
+  /* -webkit-text-stroke: 2px #000; */
+}
+
+.welcomeBackPlease {
+  position: absolute;
+  top: 366px;
+  left: 86px;
+  font-size: 18px;
+  color: #ACFF00;
+}
+
+.artificialIntelligenceDrivin {
+  margin-block-start: 0;
+  margin-block-end: 10px;
+}
+
+.resultsForThe {
+  margin: 0;
+  font-size: 32px;
+}
+
+.artificialIntelligenceDrivinContainer {
+  position: absolute;
+  top: 230px;
+  left: 86px;
+  font-size: 36px;
+  font-family: var(--font-open-sans);
+  color: #AFFF00;
+}
+
+.blog {
+  top: 86px;
+  left: 1071px;
+}
+
+.blog,
+.desktop1Child,
+.pricing {
+  position: absolute;
+}
+
+.pricing {
+  top: 86px;
+  left: 1172px;
+}
+
+.desktop1Child {
+  top: 120.5px;
+  left: 800.5px;
+  background-color: #ACFF00;
+  border-top: 3px solid #ACFF00;
+  box-sizing: border-box;
+  width: 72px;
+  height: 3px;
+}
+
+.desktop1Item {
+  border: 0;
+  background-color: transparent;
+  position: absolute;
+  top: 526px;
+  left: 89px;
+}
+
+.desktop1Inner {
+  position: absolute;
+  top: 625px;
+  left: 118px;
+  background-color: var(--color-white);
+  border: 1px solid #e5e5e5;
+  box-sizing: border-box;
+  width: 13px;
+  height: 13px;
+}
+
+.rectangleButton {
+  position: absolute;
+  top: 714px;
+  left: 85px;
+}
+
+.desktop1Child1,
+.rectangleDiv {
+  position: absolute;
+  top: 714px;
+  left: 247px;
+}
+
+.rectangleDiv {
+  top: 0;
+  left: 662px;
+  background-color: rgba(229, 229, 229, 0.41);
+  width: 778px;
+  height: 1024px;
+}
+
+.clipMessageSent1Icon {
+  position: absolute;
+  top: 210px;
+  left: 598px;
+  width: 839px;
+  height: 428px;
+  object-fit: contain;
+}
+
+.desktop1 {
+  position: relative;
+  background-color: #2E2E2E;
+  width: 100%;
+  height: 1024px;
+  overflow: hidden;
+  text-align: left;
+  font-size: var(--font-size-5xl);
+  color: #ACFF00;
+  font-family: var(--font-roboto);
+}
+
+.btnFacebook {
+  width: 200px;
+  height: 35px;
+  border-radius: 4px;
+  background: #3b5998;
+  color: white;
+  border: 0px transparent;
+  text-align: center;
+  margin: 5px;
+  display: inline-block;
+}

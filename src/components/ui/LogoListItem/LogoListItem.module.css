@@ -1,0 +1,7 @@
+.root {
+    @apply flex items-center justify-between px-5 py-4 bg-white hover:bg-container_light border-l-4
+    border-b border-l-white hover:border-l-primary transition-all duration-100;
+}
+.container {
+    @apply flex items-center cursor-pointer text-md gap-2;
+}

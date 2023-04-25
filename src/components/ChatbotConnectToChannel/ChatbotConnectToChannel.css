@@ -1,0 +1,37 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;1,100;1,300;1,400;1,500&display=swap');
+
+.chat__bot__connect__channel__main{
+    @apply bg-gray-50 min-h-screen p-4;
+}
+
+/* .chat__bot__connect__channel__container{
+    @apply container mx-auto;
+} */
+
+.chat__bot__connect__channel__container h1{
+    @apply text-2xl mb-3;
+    font-family: 'Roboto', sans-serif;
+}
+
+.chat__bot__connect__channel__container  p{
+    @apply text-sm;
+    font-family: 'Roboto', sans-serif;
+}
+
+.chat__bot__connect__channel__container .chat__bot__contect__message{
+    @apply bg-white w-full rounded-2xl h-[720px] mt-4 shadow;
+}
+
+.chat__bot__connect__channel__container .chat__bot__contect__message .message_side{
+    @apply h-screen border-r border-solid overflow-hidden p-4;
+}
+
+
+.chat__bot__contect__message .message_side .search__messages{
+    @apply w-[230px] h-[56px] bg-[#E8E8E8] rounded-full flex items-center px-3;
+}
+
+.chat__bot__connect__channel__container .messages__details{
+    @apply container mx-auto p-10;
+}

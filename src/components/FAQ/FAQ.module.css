@@ -1,0 +1,8 @@
+.wrapText {
+  @apply w-full;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.disabled {
+  background-color: #f5f5f5;
+}

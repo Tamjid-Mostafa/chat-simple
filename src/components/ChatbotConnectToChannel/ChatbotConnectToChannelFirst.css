@@ -1,0 +1,26 @@
+
+
+.chat__box__connect__to__channel__main{
+    @apply bg-gray-50 min-h-screen p-10;
+}
+
+.chat__box__connect__to__channel__container{
+    @apply container mx-auto;
+}
+
+.chat__box__connect__to__channel__container h1{
+    @apply text-2xl mb-3;
+}
+
+.chat_bot_first_channel__box{
+    @apply bg-white w-full rounded-2xl h-[720px] shadow p-8 relative;
+}
+
+.faq__yellow{
+    @apply w-[480px] h-[72px] bg-[#EEF8F0] mt-4 border border-solid border-[#66B467];
+border-radius: 16px;
+}
+
+.channel__drop__down{
+    @apply flex items-center gap-3 hover:bg-gray-100 w-24 px-2 py-2 rounded cursor-pointer;
+}

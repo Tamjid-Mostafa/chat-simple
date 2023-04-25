@@ -1,0 +1,19 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;1,100;1,300;1,400;1,500&display=swap');
+
+.chat__box__finish__main{
+    @apply bg-gray-50 min-h-screen p-4;
+}
+
+.chat__box__finish__main .chat__box_container{
+    @apply container mx-auto;
+}
+.chat__box__finish__main .chat__box_container h1{
+    @apply text-2xl mb-2;
+    
+}
+
+.chat__box__finish__main .chat__box_container p{
+    @apply text-sm;
+    font-family: 'Roboto', sans-serif;
+}
