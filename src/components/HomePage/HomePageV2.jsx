@@ -27,6 +27,7 @@ import MostActive from "../MostActive/MostActive";
 import ActiveCountries from "../ActiveCountries/ActiveCountries";
 import Reports from "../Reports/Reports";
 import ChannelCard from "../ChannelCard/ChannelCard";
+import { useSnackbar } from "../ui/MySnackbar/useSnakeBar";
 // this file
 
 export default function HomePageV2({ changeDashboardTab, user }) {
@@ -36,9 +37,9 @@ export default function HomePageV2({ changeDashboardTab, user }) {
   // const { user } = useSelector((state) => state.user);
   const { channels, loading } = useSelector((state) => state.channel);
 
-  const [showAlert, setShowAlert] = useState(false);
+  const { showSnackbar } = useSnackbar()
 
-  console.log(channels)
+  const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
     const data = {
@@ -71,40 +72,70 @@ export default function HomePageV2({ changeDashboardTab, user }) {
         chatbot_id: "none",
       }
     };
-    dispatch(createChannel(data));
     setShowAlert(true)
+    dispatch(createChannel(data))
+      .then(() => {
+        const data = {
+          userID: user?.user_id,
+          pageToken: {
+            page_token: { last_time: new Date().toISOString().split('T')[0] },
+          },
+        };
+        showSnackbar("Channel added successfully!")
+        dispatch(userDetails(user?.user_id));
+        dispatch(allChannels(data));
+      })
+      .catch((error) => {
+        console.error('Error handling delete:', error);
+      });
   };
-  useEffect(() => {
-    const data = {
-      userID: user?.user_id,
-      pageToken: {
-        page_token: { last_time: new Date().toISOString().split('T')[0] },
-      },
-    };
-    if (loading) {
-      dispatch(allChannels(data));
-    }
-  }, [loading]);
+  // const handleDelete = (bot) => {
+  //   console.log(bot);
+  //   dispatch(deleteChatbot(bot))
+  //     .then(() => {
+  //       const data = {
+  //         userID: user?.user_id,
+  //         pageToken: { last_time: new Date().toISOString().split('T')[0] }
+  //       };
+  //       dispatch(allChatbots(data));
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error handling delete:', error);
+  //     });
+  // };
+  // useEffect(() => {
+  //   const data = {
+  //     userID: user?.user_id,
+  //     pageToken: {
+  //       page_token: { last_time: new Date().toISOString().split('T')[0] },
+  //     },
+  //   };
+  //   if (loading) {
+  //     dispatch(allChannels(data));
+  //   }
+  // }, [loading]);
 
-  if (loading) {
-    return (
-      <div className='flex items-center justify-center min-h-screen w-[70vh]'>
-        <CircularProgress />
-      </div>
-    )
-  }
+  // if (loading) {
+  //   return (
+  //     <div className='flex items-center justify-center min-h-screen w-[70vh]'>
+  //       <CircularProgress />
+  //     </div>
+  //   )
+  // }
 
   return (
     <>
 
-      <main className="chat__simple__main2 p-5">
+      <main className="my-5 px-5 ">
         <div className="chat__simple__container">
-          <h1>{user?.first_name
-            ?
-            `${user?.first_name}!`
-            :
-            'Anonymous'
-          }</h1>
+          <h1>
+            {user?.first_name
+              ?
+              `${user?.first_name}!`
+              :
+              'Anonymous'
+            }
+          </h1>
           <div className="small__two__connextios__row">
             <span>{channels?.length || '0'} connected channels</span>
             {/* <span>838 contacts</span> */}
@@ -113,33 +144,46 @@ export default function HomePageV2({ changeDashboardTab, user }) {
             <h4>Active Channels</h4>
           </div>
 
-          <div className="grid  xl:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-10">
+          <div className="grid  xl:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-10 container">
 
             {
-              channels?.user_platforms?.map((item, i) => {
-                return (
-                  <ChannelCard item={item} key={i} />
-                )
-              })
+              loading ?
+                <div className='flex items-center justify-center min-h-screen w-[70vh]'>
+                  <CircularProgress />
+                </div>
+                :
+                <>
+                  {
+                    channels?.user_platforms?.map((item, i) => {
+                      return (
+                        <ChannelCard item={item} key={i} />
+                      )
+                    })
+                  }
+                  <div
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="cards_three cursor-pointer border-2 border-dashed rounded-lg p-5 flex justify-center items-center">
+                    <h5>+ Add channel</h5>
+                  </div>
+                  <PopUp
+                    isOpen={isOpen}
+                    setIsOpen={setIsOpen}
+                  >
+                    <AddChannel
+                      channelHandler={channelHandler}
+                      setIsOpen={setIsOpen}
+                      user={user}
+                      setShowAlert={setShowAlert}
+                    />
+                  </PopUp>
+                </>
             }
-
-            <div style={{ width: '262px', height: '229px' }}
-              onClick={() => setIsOpen(!isOpen)}
-              className="cards_three cursor-pointer border-2 border-dashed rounded-lg p-5 flex justify-center items-center">
-              <h5>+ Add channel</h5>
-            </div>
-            <PopUp
-              isOpen={isOpen}
-              setIsOpen={setIsOpen}
-            >
-              <AddChannel
-                channelHandler={channelHandler}
-                setIsOpen={setIsOpen}
-                user={user}
-                setShowAlert={setShowAlert}
-              />
-            </PopUp>
           </div>
+
+
+
+
+
           <Reports />
           <div className="grid lg:grid-cols-3 md:grid-col-2 grid-cols-1 gap-x-5 gap-y-5">
             <BotTask />
@@ -147,8 +191,11 @@ export default function HomePageV2({ changeDashboardTab, user }) {
             <ActiveCountries />
           </div>
         </div>
-        {showAlert && <ActionAlert severity="success" message={"Channel Created"}></ActionAlert>}
+
       </main>
+
+
+
     </ >
   );
 }

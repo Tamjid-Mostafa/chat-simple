@@ -1,20 +1,13 @@
-import { TextField, Switch, Alert, CircularProgress } from '@mui/material';
-import { Box, Typography, IconButton } from '@mui/material';
+import { TextField, CircularProgress } from '@mui/material';
 import { useState } from 'react';
 import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
-import Snackbar from '@mui/material/Snackbar';
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import trash from '../../assets/images/svg/trash.svg'
-import ConversationCard from './ConversationCard';
-import Cross from '../../icons/Cross';
 import Add from "../../assets/images/svg/Add.svg";
-import AddChannelButton from '../Buttons/AddChannelButton';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import { EditableElement } from '../EditableElement/EditableElement';
-import { toast } from 'react-hot-toast';
-import ActionAlert from '../Alert/ActionAlert';
-import MySnackbar from '../ui/MySnackbar/MySnackbar';
+import { useSnackbar } from '../ui/MySnackbar/useSnakeBar';
 
 
 const Chatbot_business_talk = ({ changeChatbotTab }) => {
@@ -34,6 +27,9 @@ const Chatbot_business_talk = ({ changeChatbotTab }) => {
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
+
+
+    const { showSnackbar } = useSnackbar();
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
@@ -80,14 +76,13 @@ const Chatbot_business_talk = ({ changeChatbotTab }) => {
                 data,
                 { headers }
             );
-            setSnackbarMessage(response.data.message);
-            setSuccess(true);
+            showSnackbar(response.data.message, 'success');
             setLoading(false)
 
             // window.alert(response.data.message);
         }
         catch (e) {
-            setDirty(e.message);
+            showSnackbar(e.message, 'error');
             setError(true);
             //window.alert(e.message)
         }
@@ -119,97 +114,98 @@ const Chatbot_business_talk = ({ changeChatbotTab }) => {
 
     return (
         <>
-            <div className='chatbot_dsplay_column'>
-                <div className='chatbot_display_text '>
-                    <h1 className='bold_text font_32 margintop'>Business Small Talk</h1>
+
+            <div className='space-y-5 px-5'>
+                <div className='lg:w-3/4 w-full space-y-3'>
+                    <h1 className='font-bold text-2xl'>Business Small Talk</h1>
                     <p className='text-sm'>
                         This expertise empowers your chatbot to serve as a customer representative, skillfully handling inquiries using your business's specified tone and vocabulary. By providing your business name, the chatbot offers human-like responses to general questions about your business. If you would like the chatbot to be more robust, select additional custom fields to personalize the bot to your business needs, ensuring a tailored and seamless customer experience.
                     </p>
-                    <div className='display_flex margintop'>
-                        <div>
+                </div>
+
+                <div>
+                    <TextField
+                        label="Business Name"
+                        variant="outlined"
+                        value={businessName}
+                        onChange={(event) => setBusinessName(event.target.value)}
+                    />
+                </div>
+
+                <div className='space-y-3'>
+                    <h2 className='font-bold text-xl'>
+                        Personalise your bot
+                    </h2>
+                    <p className='text-sm'>
+                        Select from a list of common fields other businesses use or build your own custom fields.
+                    </p>
+                </div>
+
+                <div className='flex flex-col gap-5 w-52'>
+                    <TextField
+                        label="Business Hours"
+                        variant="outlined"
+                        value={businessHours}
+                        onChange={(event) => setBusinessHours(event.target.value)}
+                    />
+
+                    <TextField
+                        label="Industry"
+                        variant="outlined"
+                        value={industry}
+                        onChange={(event) => setIndustry(event.target.value)}
+                    />
+
+                    <TextField
+                        label="History"
+                        variant="outlined"
+                        value={history}
+                        onChange={(event) => setHistory(event.target.value)}
+                    />
+
+                    <TextField
+                        label="Support Email"
+                        variant="outlined"
+                        value={supportEmail}
+                        size="small"
+                        onChange={(event) => setSupportEmail(event.target.value)}
+                    />
+                </div>
+                <button className='flex items-center gap-2 bg-[#66B467] text-xs text-white px-4 py-2.5 rounded-full' onClick={handleAddInput}>
+                    <img src={Add} alt="" />
+                    Add Field
+                </button>
+
+                {inputs.map((input, index) => (
+                    <div key={index} className="flex items-center gap-5">
+                        <div className=''>
+                            <EditableElement onChange={handleChange}>
+                                <div style={{ outline: "none" }}
+                                    className='flex items-center gap-3'
+                                >
+                                    <p>{initialValue}</p>
+                                    <DriveFileRenameOutlineIcon className='cursor-pointer'
+                                    />
+                                </div>
+                            </EditableElement>
                             <TextField
-                                label="Business Name"
                                 variant="outlined"
-                                value={businessName}
-                                onChange={(event) => setBusinessName(event.target.value)}
+                                value={input}
+                                size="small"
+                                onChange={(e) => handleInputChange(e, index)}
                             />
                         </div>
-                    </div>
-                    <div className='margintop'>
-                        <h2 className='chatbot_business-text'>Personalise your bot</h2>
-                        <p className='text-sm margintoptext'>
-                            Select from a list of common fields other businesses use or build your own custom fields.
-                        </p>
-                    </div>
+                        {inputs.length >= 2 ?
+                            <button button type="button" onClick={() => handleRemoveInput(index)}>
+                                <img src={trash} alt="" />
+                            </button> : ""}
 
-                    <div className='margintop'>
-                        <TextField
-                            label="Business Hours"
-                            variant="outlined"
-                            value={businessHours}
-                            onChange={(event) => setBusinessHours(event.target.value)}
-                        />
                     </div>
-                    <div className='margintop'>
-                        <TextField
-                            label="Industry"
-                            variant="outlined"
-                            value={industry}
-                            onChange={(event) => setIndustry(event.target.value)}
-                        />
-                    </div>
-                    <div className='margintop'>
-                        <TextField
-                            label="History"
-                            variant="outlined"
-                            value={history}
-                            onChange={(event) => setHistory(event.target.value)}
-                        />
-                    </div>
-                    <div className='margintop'>
-                        <TextField
-                            label="Support Email"
-                            variant="outlined"
-                            value={supportEmail}
-                            size="small"
-                            onChange={(event) => setSupportEmail(event.target.value)}
-                        />
-                    </div>
-                    <button className='flex items-center gap-2 bg-[#66B467] text-xs text-white px-4 py-2.5 rounded-full' onClick={handleAddInput}>
-                        <img src={Add} alt="" />
-                        Add Field
-                    </button>
+                ))
+                }
 
-                    {inputs.map((input, index) => (
-                        <div key={index} className="flex items-center gap-5">
-                            <div className='margintop'>
-                                <EditableElement onChange={handleChange}>
-                                    <div style={{ outline: "none" }}
-                                        className='flex items-center gap-3'
-                                    >
-                                        <p>{initialValue}</p>
-                                        <DriveFileRenameOutlineIcon className='cursor-pointer'
-                                        />
-                                    </div>
-                                </EditableElement>
-                                <TextField
-                                    variant="outlined"
-                                    value={input}
-                                    size="small"
-                                    onChange={(e) => handleInputChange(e, index)}
-                                />
-                            </div>
-                            {inputs.length >= 2 ?
-                                <button button type="button" onClick={() => handleRemoveInput(index)}>
-                                    <img src={trash} alt="" />
-                                </button> : ""}
-
-                        </div>
-                    ))
-                    }
-
-                    <div className=''>
-                        {/* <div className='margintop'>
+                <div className=''>
+                    {/* <div className=''>
                             <TextField
                                 label="Comments"
                                 variant="outlined"
@@ -218,28 +214,16 @@ const Chatbot_business_talk = ({ changeChatbotTab }) => {
                                 onChange={(event) => setSupportEmail(event.target.value)}
                             />
                         </div> */}
-                        <button className='text-sm text-white px-5 w-32 h-10 bg-[#66B467] py-2 rounded-full disabled:bg-gray-200 mb-10'
-                            disabled={loading}
-                            onClick={handleBusinessDetails}>
-                            {loading ? <CircularProgress
-                                size={16}
-                            /> : "Create"}
-                        </button>
-                    </div>
+                    <button className='text-sm text-white px-5 w-32 h-10 bg-[#66B467] py-2 rounded-full disabled:bg-gray-200 mb-10'
+                        disabled={loading}
+                        onClick={handleBusinessDetails}>
+                        {loading ? <CircularProgress
+                            size={16}
+                        /> : "Create"}
+                    </button>
                 </div>
             </div>
-            <MySnackbar
-                open={success}
-                handleClose={handleClose}
-                message={snackbarMessage}
-                variant='success'
-            />
-            <MySnackbar
-                open={error}
-                handleClose={handleClose}
-                message={snackbarMessage}
-                variant='error'
-            />
+
         </>
     )
 }

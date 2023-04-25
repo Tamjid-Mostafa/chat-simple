@@ -6,7 +6,7 @@ import barIcon from "../../assets/images/svg/barIcon.svg";
 const ChannelCard = ({ item }) => {
     return (
         <>
-            <div style={{ width: '262px', height: '229px' }} className="border p-5 rounded-lg mb-2">
+            <div className="border p-5 rounded-lg mb-2 h-[262px]">
                 <div className="header flex justify-between items-center mb-5">
                     <div className="flex items-center gap-3">
                         <img src={item.platform_type === 'PlatformType.MESSENGER' ? facebook : instagram} alt="" className="w-12 h-12" />

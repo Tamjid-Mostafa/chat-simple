@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react"
+import {  useState } from "react"
 import Chatbot from "../components/Chatbot"
 import DashboardC from "../components/Dashboard"
 import "../styles/dashboard.css"
-import { useSelector } from "react-redux"
 import Sidebar from "../components/Sidebar/Sidebar"
 
 const Dashboard = () => {
@@ -17,14 +16,14 @@ const Dashboard = () => {
   // })
   let user = {
     active_chatbot_count: 0,
-    email: "admin@localhost5.com",
-    first_name: "John1",
-    last_name: "Smith",
+    email: "admin@admin.com",
+    first_name: "Tamjid",
+    last_name: "Mostafa",
     login_type: "LoginType.GOOGLE",
     plan: "none",
     timezone: "UTC",
     user_fb_id: "none",
-    user_id: "1124",
+    user_id: "tamjid",
     user_type: "UserType.USER"
   }
 
@@ -38,8 +37,8 @@ const Dashboard = () => {
           changeDashboardTab={changeDashboardTab} />
       </div>
       <div className={`${!isExpand ? 'pl-20' : 'ml-[300px]'} transition-all duration-700 w-full relative`}>
-        {dashboardTab === 1 && <div className="dashboard_tab_container"><DashboardC user={user} /></div>}
-        {dashboardTab === 2 && <div className="dashboard_tab_container"><Chatbot user={user} /></div>}
+        {dashboardTab === 1 && <DashboardC user={user} />}
+        {dashboardTab === 2 && <Chatbot user={user} />}
       </div>
     </div>
   )

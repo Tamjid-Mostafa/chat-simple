@@ -1,22 +1,10 @@
 import React from 'react';
 import MessengerImage from '../../assets/images/svg/messenger.svg';
-import barIcon from '../../assets/images/svg/barIcon.svg';
 import { Switch } from '@mui/material';
 import displayimg from '../../assets/chatbotcardpic.png';
-import { useDispatch, useSelector } from 'react-redux';
-import { allChatbots, deleteChatbot } from '../../redux/reducers/chatbotSlice';
 
-const BootCard = ({ changeChatbotTab, bot, setChatbotTitle, setChatbotID }) => {
-  const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.user);
-  
-  const handleDelete = () => {
-    dispatch(deleteChatbot(bot));
-    const data = {
-      userID: user?.user_id,
-    };
-    dispatch(allChatbots(data));
-  };
+const BootCard = ({ changeChatbotTab, bot, setChatbotTitle, setChatbotID, handleDelete }) => {
+
 
   const edit = () => {
     changeChatbotTab(2)
@@ -82,7 +70,7 @@ const BootCard = ({ changeChatbotTab, bot, setChatbotTitle, setChatbotID }) => {
           </button>
 
           <button
-            onClick={handleDelete}
+            onClick={()=>handleDelete(bot)}
             className='text-sm text-white px-5 bg-[#66B467] py-2 rounded-full'
           >
             Delete

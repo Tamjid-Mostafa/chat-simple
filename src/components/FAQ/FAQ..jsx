@@ -3,12 +3,11 @@ import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
 import { CircularProgress, TextField } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
-import { borderTop } from '@mui/system';
+import {  useSelector } from 'react-redux';
 import cn from 'clsx'
 import s from './FAQ.module.css'
 import { v4 as uuidv4 } from 'uuid';
-import MySnackbar from '../ui/MySnackbar/MySnackbar';
+import { useSnackbar } from '../ui/MySnackbar/useSnakeBar';
 
 const CustomTextField = ({ id, field, value, onChange }) => {
     const handleChange = (event) => {
@@ -25,20 +24,10 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
     const { user } = useSelector((state) => state.user);
     const [isTrue, setIsTrue] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [open, setOpen] = useState(false);
-    const [message, setMessage] = useState('');
+
     const [url, setUrl] = useState('');
 
-    const [success, setSuccess] = useState(false);
-    const [error, setError] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState('');
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setError(false);
-        setSuccess(false);
-    };
+    
 
 
     const [faqs, setFaqs] = useState({
@@ -52,6 +41,10 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
     const [data, setData] = useState([])
     const [rows, setRows] = useState([])
     
+
+    const { showSnackbar } = useSnackbar();
+
+
     useEffect(() => {
         setRows(data);
     }, [data]);
@@ -98,13 +91,11 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
                         timeout: 30000, // Set the timeout to 30000 milliseconds (30 seconds)
                     }
                 );
-                setSuccess(true);
-                setSnackbarMessage(response.data.message);
+                showSnackbar(response.data.message, 'success');
                 setLoading(false)
 
-            } catch (error) {
-                setError(true);
-                setSnackbarMessage(e.message);
+            } catch (e) {
+                showSnackbar(e.message, 'error');
             }
         }
 
@@ -128,8 +119,9 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
             setFaqs(response.data);
             setIsTrue(true);
             setLoading(false)
+            showSnackbar('FAQ Generated successfully', 'success');
         } catch (error) {
-            setMessage(error.message);
+            showSnackbar(error.message, 'error');
         }
     };
 
@@ -183,7 +175,7 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
         },
     ];
     return (
-        <>
+        <div className='px-5'>
             <div className='space-y-5'>
                 <h1 className='text-xl font-bold '>FAQ</h1>
                 <p className='text-sm'>
@@ -244,19 +236,7 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
                     /> : "Build"}
                 </button>
             </div>
-            <MySnackbar
-                open={success}
-                handleClose={handleClose}
-                message={snackbarMessage}
-                variant='success'
-            />
-            <MySnackbar
-                open={error}
-                handleClose={handleClose}
-                message={snackbarMessage}
-                variant='error'
-            />
-        </>
+        </div>
     );
 }
 

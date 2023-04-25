@@ -2,17 +2,9 @@ import React from 'react'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import {Link, NavLink} from "react-router-dom"
 import ChangeHistoryIcon from '@mui/icons-material/ChangeHistory';
-import { useNavigate } from 'react-router-dom';
 
-const Topbar = () => {
+const Topbar = ({backChatbotTab}) => {
     const [showModal, setShowModal] = React.useState(false);
-
-    const navigate = useNavigate();
-
-    function handleBackRoute() {
-      navigate(-1); // Go back one step in history
-    }
-
   return (
     <>
 
@@ -20,18 +12,18 @@ const Topbar = () => {
       <div>
         <div className="left_top flex justify-between items-center h-[50px] px-[20px] text-white bg-[#454545] ">
           <div>
-          <Link onClick={handleBackRoute} to="/" className='duration-100 hover:opacity-80'>
+          <div onClick={backChatbotTab} className='duration-100 hover:opacity-80 cursor-pointer'>
             <ChevronLeftIcon /> Back
-          </Link>
+          </div>
           </div>
           <div className='flex justify-end items-center gap-4'>
-            <Link className='py-2 px-4 bg-[#625B71] rounded-full hover:opacity-75 duration-100'>
+            <div className='py-2 px-4 bg-[#625B71] rounded-full hover:opacity-75 duration-100'>
               <ChangeHistoryIcon className='rotate-90 ' style={{fontSize:"1.2rem", paddingBottom:"-2px"}} /> Preview
-            </Link>
+            </div>
 
-            <Link onClick={() => setShowModal(true)} to="#" className='py-2 px-5 bg-[#66B467] rounded-full hover:opacity-80 duration-100'>
+            <button onClick={() => setShowModal(true)}className='py-2 px-5 bg-[#66B467] rounded-full hover:opacity-80 duration-100'>
               Publish
-            </Link>
+            </button>
           </div>
         </div>
       </div>

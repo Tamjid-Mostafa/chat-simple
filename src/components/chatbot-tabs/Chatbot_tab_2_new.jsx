@@ -109,9 +109,9 @@ const Chatbot_tab_2_new = ({ changeChatbotTab }) => {
           </div>
         </div>
       </div> */}
-      <div className='chatbot_dsplay_column'>
-        <div className='chatbot_display_text'>
-          <h1 className='bold_text font_32'>
+      <div className='px-5'>
+        <div className=''>
+          <h1 className='font-bold font_32'>
             Discover the world of chat simple
           </h1>
         </div>

@@ -16,10 +16,11 @@ import Topbar from './Topbar/Topbar';
 import ListItem from './ui/ListItem';
 import LogoListItem from './ui/LogoListItem/LogoListItem';
 import FAQ from './FAQ/FAQ.';
-import MySnackbar from './ui/MySnackbar/MySnackbar';
 import { createChatbot, createChatBot, getChatbot, updateChatbot, updateChatBot } from '../redux/reducers/chatbotSlice';
+import { useSnackbar } from './ui/MySnackbar/useSnakeBar';
 
 const Chatbot = () => {
+  const { showSnackbar } = useSnackbar();
   const [chatbotTab, setChatbotTab] = React.useState(1);
   const { loading, user: userData } = useSelector((state) => {
     return state.auth;
@@ -33,10 +34,21 @@ const Chatbot = () => {
   const changeChatbotTab = (tab) => {
     setChatbotTab(tab);
   };
+  const backChatbotTab = () => {
+    if(chatbotTab > 1) {
+      setChatbotTab(chatbotTab-1);
+    }
+  };
+  
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
   const { chatbots } = useSelector((state) => state.chatbot); // this has all the chat-bots list for a user that is logged in
   const { chatbot } = useSelector((state) => state.chatbot)
+
+  
+
+
+  
   const [isTyping, setIsTyping] = useState(false);
   const [chatbotTitle, setChatbotTitle] = useState('');
   const [prevTitle, setPrevTitle] = useState('');
@@ -44,17 +56,6 @@ const Chatbot = () => {
 
   const [platforms, setPlatforms] = useState([]);
 
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setError(false);
-    setSuccess(false);
-  };
 
   useEffect(()=>{
     if (chatbotID && user.user_id) {
@@ -106,7 +107,6 @@ const Chatbot = () => {
 
 
   const CreateChatbot = () => {
-    console.log("createChatbot")
     const data = {
       userID: user?.user_id,
       chatbotDetail: {
@@ -117,13 +117,16 @@ const Chatbot = () => {
       chatbotID: uuidv4(),
     };
     setChatbotID(data.chatbotID);
-    dispatch(createChatbot(data));
-    // console.log(data)
-    setSnackbarMessage('Created Successfully')
+    dispatch(createChatbot(data))
+    .then(()=> {
+      showSnackbar('Created Successfully', 'success')
+    })
+    .catch((error) => {
+      console.error('Error handling delete:', error);
+    });
   }
 
   const UpdateChatbot = () => {
-    // console.log("update chatbot")
     setPrevTitle(chatbotTitle);
     // update here
     const data = {
@@ -132,54 +135,24 @@ const Chatbot = () => {
       chatbotID: chatbotID,
       update_mask: 'chatbot_title',
     };
-    dispatch(updateChatbot(data));
-    setSnackbarMessage('Updated Successfully')
+    dispatch(updateChatbot(data))
+    .then(()=> {
+      showSnackbar('Updated Successfully', 'success')
+    })
+    .catch((error) => {
+      console.error('Error handling delete:', error);
+    });
+    
   }
 
-  useEffect(() => {
-    if (snackbarMessage !== '') {
-      return setSuccess(true)
-    }
-  }, [snackbarMessage])
-  // useEffect(() => {
-  //   if (!prevTitle) {
-  //     // create new
-  //     if (!isTyping && !chatbotTitle) {
-  //       const data = {
-  //         userID: user?.user_id,
-  //         chatbotDetail: {
-  //           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  //           platforms: null,
-  //           chatbot_title: chatbotTitle,
-  //         },
-  //         chatbotID: uuidv4(),
-  //       };
-  //       setChatbotID(data.chatbotID);
-  //       dispatch(createChatbot(data));
-  //       // setSuccess(true);
-  //     }
-  //   } else if (prevTitle !== chatbotTitle && !isTyping) {
-  //     setPrevTitle(chatbotTitle);
-  //     // update here
-  //     const data = {
-  //       userID: user?.user_id,
-  //       update: { chatbot_title: chatbotTitle },
-  //       chatbotID: chatbotID,
-  //       update_mask: 'chatbot_title',
-  //     };
-  //     dispatch(updateChatbot(data));
-  //     // setSuccess(true);
-
-  //   }
-  // }, [isTyping, chatbotTitle]);
+  
 
 
   const handlePlatform = (value) => {
     let copyPlatform = platforms;
 
     if (!chatbotID) {
-      setError(true)
-      setSnackbarMessage('Create chatbot name')
+      showSnackbar('Create chatbot name', 'error')
       return;
     }
 
@@ -233,7 +206,6 @@ const Chatbot = () => {
 
   return (
     <>
-
       <div className='w-full relative'>
         {chatbotTab === 1 && (
           <Chatbot_tab_1
@@ -245,7 +217,7 @@ const Chatbot = () => {
           />
         )}
         <div className={`w-full sticky top-0 z-10 ${chatbotTab !== 1 ? '' : 'hidden'}`}>
-          <Topbar />
+          <Topbar backChatbotTab={backChatbotTab} />
         </div>
         <div className='flex'>
           <div className={`${chatbotTab !== 1 ? 'relative' : 'hidden'}`}>
@@ -319,7 +291,7 @@ const Chatbot = () => {
               <FAQ
                 changeChatbotTab={changeChatbotTab}
                 user={userData}
-                chatbotTitle={chatbotTitle || chatbot?.chatbot_title}
+                chatbotTitle={chatbotTitle}
               />
             )}
             {chatbotTab === 4 && (
@@ -356,18 +328,6 @@ const Chatbot = () => {
           </div>
         </div>
       </div>
-      <MySnackbar
-        open={success}
-        handleClose={handleClose}
-        message={snackbarMessage}
-        variant='success'
-      />
-      <MySnackbar
-        open={error}
-        handleClose={handleClose}
-        message={snackbarMessage}
-        variant='error'
-      />
     </>
   );
 };

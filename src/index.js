@@ -24,6 +24,7 @@ import {
   StyledEngineProvider,
 } from "@mui/material/styles";
 import { orange } from "@mui/material/colors";
+import { MySnackbar, SnackbarProvider } from "./components/ui/MySnackbar/useSnakeBar";
 
 const CustomCheckbox = styled(Checkbox)(({ theme }) => ({
   color: theme.status.danger,
@@ -71,7 +72,10 @@ root.render(
           {/* <CssBaseline /> */}
           <Provider store={store}>
             <PersistGate loading={null} persistor={persistor}>
+              <SnackbarProvider>
               <App />
+              <MySnackbar />
+              </SnackbarProvider>
               <Toaster />
             </PersistGate>
           </Provider>
