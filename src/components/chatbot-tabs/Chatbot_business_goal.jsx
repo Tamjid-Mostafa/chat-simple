@@ -15,9 +15,7 @@ const Chatbot_business_goal = ({ chatbot, changeChatbotTab }) => {
     const [position, setPosition] = useState("")
     const [loading, setLoading] = useState(false);
 
-    const [success, setSuccess] = useState(false);
-    const [error, setError] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState('');
+
     const { user } = useSelector((state) => state.user);
 
     const { showSnackbar } = useSnackbar();

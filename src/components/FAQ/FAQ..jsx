@@ -3,11 +3,12 @@ import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
 import { CircularProgress, TextField } from '@mui/material';
-import {  useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import cn from 'clsx'
 import s from './FAQ.module.css'
 import { v4 as uuidv4 } from 'uuid';
 import { useSnackbar } from '../ui/MySnackbar/useSnakeBar';
+import styled from 'styled-components';
 
 const CustomTextField = ({ id, field, value, onChange }) => {
     const handleChange = (event) => {
@@ -18,7 +19,24 @@ const CustomTextField = ({ id, field, value, onChange }) => {
             event.stopPropagation();
         }
     };
-    return <TextField  value={value} onChange={handleChange} onKeyDown={handleKeyDown} />;
+    return <TextField
+        sx={{
+          '& fieldset': { border: 'none' },
+          '& .MuiInputBase-input': {
+            whiteSpace: 'normal',
+          },
+          '& .Mui-focused .MuiInputBase-input': {
+            whiteSpace: 'normal',
+          },
+        }}
+        multiline
+        fullWidth
+        className={s.wrapText}
+        value={value}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        
+    />;
 };
 const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
     const { user } = useSelector((state) => state.user);
@@ -27,7 +45,7 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
 
     const [url, setUrl] = useState('');
 
-    
+
 
 
     const [faqs, setFaqs] = useState({
@@ -40,7 +58,7 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
     });
     const [data, setData] = useState([])
     const [rows, setRows] = useState([])
-    
+
 
     const { showSnackbar } = useSnackbar();
 
@@ -53,7 +71,7 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
         if (faqs) {
             const combinedData = Object.keys(faqs?.question).map((key, index) => {
                 return {
-                    id: index+1,
+                    id: index + 1,
                     question: faqs.question[key],
                     answer: faqs.answer[key] || '',
                 };
@@ -138,14 +156,8 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
 
     const columns = [
         {
-            field: 'id',
-            headerName: 'ID',
-            width: 90,
-        },
-        {
             field: 'question',
             headerName: 'Question',
-            width: 150,
             flex: 1,
             renderCell: (params) => (
                 <CustomTextField
@@ -159,9 +171,9 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
         {
             field: 'answer',
             headerName: 'Answer',
-            width: 150,
+            flex: 2,
+            borderRight: 'none',
             editable: 'cell',
-            flex: 1,
             sortable: false,
             renderCell: (params) => (
                 <CustomTextField
@@ -174,6 +186,10 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
             // valueGetter:handleCellEditCommit
         },
     ];
+
+
+
+
     return (
         <div className='px-5'>
             <div className='space-y-5'>
@@ -187,7 +203,7 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
                             onChange={(event) => setUrl(event.target.value)}
                             label='Enter Url'
                             variant='outlined'
-                            disabled={chatbotTitle===''&& true}
+                            disabled={chatbotTitle === '' && true}
                         />
                     </div>
                     <div className=''>
@@ -203,7 +219,7 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
 
                 <div className='mr-5'>
                     <Box sx={{
-                        height: 400,
+                        height: 500,
                         width: '100%',
                     }}>
                         <DataGrid
@@ -214,8 +230,6 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
                             }}
                             rows={rows}
                             columns={columns}
-                           
-
                             initialState={{
                                 pagination: {
                                     paginationModel: {
@@ -223,6 +237,7 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
                                     },
                                 },
                             }}
+                            rowHeight={100}
                             pageSizeOptions={[5]}
                             disableRowSelectionOnClick
                         />
