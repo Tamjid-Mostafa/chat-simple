@@ -11,21 +11,21 @@ const Dashboard = () => {
   const changeDashboardTab = (tab) => {
     setDashboardTab(tab)
   }
-  // const { loading, user } = useSelector((state) => {
-  //   return state.user
-  // })
-  let user = {
-    active_chatbot_count: 0,
-    email: "new@user.com",
-    first_name: "new",
-    last_name: "user",
-    login_type: "LoginType.GOOGLE",
-    plan: "none",
-    timezone: "UTC",
-    user_fb_id: "none",
-    user_id: "new_user",
-    user_type: "UserType.USER"
-  }
+  const { loading, user } = useSelector((state) => {
+    return state.user
+  })
+  // let user = {
+  //   active_chatbot_count: 0,
+  //   email: "new@user.com",
+  //   first_name: "new",
+  //   last_name: "user",
+  //   login_type: "LoginType.GOOGLE",
+  //   plan: "none",
+  //   timezone: "UTC",
+  //   user_fb_id: "none",
+  //   user_id: "new_user",
+  //   user_type: "UserType.USER"
+  // }
 
 
   return (
