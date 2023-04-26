@@ -34,7 +34,7 @@ const Chatbot_business_talk = ({ changeChatbotTab, chatbot, setIsChecked }) => {
 
     useEffect(() => {
         const businessTalk = chatbot?.expertises.find(
-            (expertise) => expertise.expertise_type === "ExpertiseType.BUSINSESS_SMALL_TALK"
+            (expertise) => expertise.expertise_type === "ExpertiseType.BUSINESS_SMALL_TALK"
         );
 
         if (businessTalk) {
@@ -72,7 +72,7 @@ const Chatbot_business_talk = ({ changeChatbotTab, chatbot, setIsChecked }) => {
         setState((prevState) => ({ ...prevState, loading: true }));
         const fields = {
             expertise_title: "Business Small Talk",
-            expertise_type: "BUSINSESS_SMALL_TALK",
+            expertise_type: "BUSINESS_SMALL_TALK",
             form_information: {
                 business_small_talk: [
                     {
@@ -117,7 +117,7 @@ const Chatbot_business_talk = ({ changeChatbotTab, chatbot, setIsChecked }) => {
         setState((prevState) => ({ ...prevState, loading: true }));
         const fields = {
             expertise_title: "Business Small Talk",
-            expertise_type: "BUSINSESS_SMALL_TALK",
+            expertise_type: "BUSINESS_SMALL_TALK",
             form_information: {
                 business_small_talk: [
                     {
