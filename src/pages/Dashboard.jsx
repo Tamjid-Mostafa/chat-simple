@@ -16,14 +16,14 @@ const Dashboard = () => {
   // })
   let user = {
     active_chatbot_count: 0,
-    email: "123@123.com",
-    first_name: "Tamjid",
-    last_name: "Mostafa",
+    email: "new@user.com",
+    first_name: "new",
+    last_name: "user",
     login_type: "LoginType.GOOGLE",
     plan: "none",
     timezone: "UTC",
     user_fb_id: "none",
-    user_id: "123456",
+    user_id: "new_user",
     user_type: "UserType.USER"
   }
 

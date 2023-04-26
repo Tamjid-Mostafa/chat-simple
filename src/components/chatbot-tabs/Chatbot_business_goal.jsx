@@ -18,19 +18,23 @@ const Chatbot_business_goal = ({ chatbot, changeChatbotTab }) => {
 
     const { user } = useSelector((state) => state.user);
 
+
+    // console.log(chatbot)
+
     const { showSnackbar } = useSnackbar();
 
 
     useEffect(() => {
         const businessGoalExpertise = chatbot?.expertises.find(expertise => expertise.expertise_type === "ExpertiseType.FREE_FORM");
+        // console.log(businessGoalExpertise)
         if (businessGoalExpertise) {
             setLoading(true);
             get(
                 `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${businessGoalExpertise.chatbot_expertise_id}`,
             ).then((response) => {
                 const { form_information, chatbot_expertise_id } = response.data;
-                const form = JSON.parse(form_information.replace(/'/g, "\""));
-                const { name, position } = form.business_small_talk[0];
+                // const form = JSON.parse(form_information.replace(/'/g, "\""));
+                // const { name, position } = form.business_small_talk[0];
                 setExpertiseId(chatbot_expertise_id);
                 setName(name);
                 setPosition(position);
@@ -99,7 +103,7 @@ const Chatbot_business_goal = ({ chatbot, changeChatbotTab }) => {
                 data
             );
             setLoading(false);
-            showSnackbar(response.data.message, 'success')
+            showSnackbar('Successfully updated')
             //window.alert(response.data.message);
 
         }
@@ -147,10 +151,10 @@ const Chatbot_business_goal = ({ chatbot, changeChatbotTab }) => {
                 <div className=''>
                     <button className='text-sm text-white px-5 w-32 h-10 bg-[#66B467] py-2 rounded-full disabled:bg-gray-200'
                         disabled={loading}
-                        onClick={expertiseId ? handleCreate : handleUpdate}>
+                        onClick={expertiseId ? handleUpdate : handleCreate}>
                         {loading ? <CircularProgress
                             size={16}
-                        /> : (expertiseId ? "Create" : "Save")}
+                        /> : (expertiseId ? "Save" : "Create")}
                     </button>
                 </div>
             </div>

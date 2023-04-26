@@ -20,7 +20,7 @@ const Sidebar = ({changeDashboardTab, setIsExpand, isExpand}) => {
       <div className='space-y-5'>
         <div className='h-28 w-36'>
           <img
-          className={`${!isExpand ? 'scale-75' : 'scale-100'}`}
+          className={`transition-all duration-500 ${!isExpand ? 'scale-0' : 'scale-100'}`}
           src={Logo} alt="logo" />
         </div>
         <hr className='border-accent-7' />
@@ -42,11 +42,11 @@ const Sidebar = ({changeDashboardTab, setIsExpand, isExpand}) => {
           className='flex gap-5'>
             {
               !isExpand ? 
-              <ArrowBackIosIcon
+              <ArrowForwardIosIcon
               onClick={()=> setIsExpand(!isExpand)}
               className={`text-white  cursor-pointer`}/>
               :
-              <ArrowForwardIosIcon 
+              <ArrowBackIosIcon 
               onClick={()=> setIsExpand(!isExpand)}
               className={`text-white  cursor-pointer`}/>
             }

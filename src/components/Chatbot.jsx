@@ -45,7 +45,7 @@ const Chatbot = () => {
   const { chatbots } = useSelector((state) => state.chatbot); // this has all the chat-bots list for a user that is logged in
   const { chatbot } = useSelector((state) => state.chatbot)
 
-  
+  // console.log(chatbot)
 
 
   
@@ -291,6 +291,8 @@ const Chatbot = () => {
               <FAQ
                 changeChatbotTab={changeChatbotTab}
                 user={userData}
+                chatbotID={chatbotID}
+                chatbot={chatbot}
                 chatbotTitle={chatbotTitle}
               />
             )}
@@ -298,6 +300,7 @@ const Chatbot = () => {
               <Chatbot_business_talk
                 changeChatbotTab={changeChatbotTab}
                 user={userData}
+                chatbot ={chatbot}
               />
             )}
             {chatbotTab === 5 && (
@@ -311,6 +314,7 @@ const Chatbot = () => {
               <ChatbotEscalation
                 changeChatbotTab={changeChatbotTab}
                 user={userData}
+                chatbot ={chatbot}
               />
             )}
             {chatbotTab === 7 && (

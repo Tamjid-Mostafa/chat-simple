@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
@@ -9,44 +9,54 @@ import s from './FAQ.module.css'
 import { v4 as uuidv4 } from 'uuid';
 import { useSnackbar } from '../ui/MySnackbar/useSnakeBar';
 import styled from 'styled-components';
+import { get, put } from '../../network';
 
-const CustomTextField = ({ id, field, value, onChange }) => {
-    const handleChange = (event) => {
-        onChange(id, field, event.target.value);
-    };
-    const handleKeyDown = (event) => {
-        if (event.key === ' ') {
-            event.stopPropagation();
-        }
-    };
-    return <TextField
-        sx={{
-          '& fieldset': { border: 'none' },
-          '& .MuiInputBase-input': {
-            whiteSpace: 'normal',
-          },
-          '& .Mui-focused .MuiInputBase-input': {
-            whiteSpace: 'normal',
-          },
-        }}
-        multiline
-        fullWidth
-        className={s.wrapText}
-        value={value}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        
-    />;
-};
-const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
+
+// const CustomTextField = React.memo(({ id, field, value, onChange }) => {
+//     const handleChange = (event) => {
+//         onChange(event);
+//     };
+//     const handleKeyDown = (event) => {
+//         if (event.key === ' ') {
+//             event.stopPropagation();
+//         }
+//     };
+//     return (
+//         <TextField
+//             sx={{
+//                 '& fieldset': { border: 'none' },
+//                 '& .MuiInputBase-input': {
+//                     whiteSpace: 'normal',
+//                 },
+//                 '& .Mui-focused .MuiInputBase-input': {
+//                     whiteSpace: 'normal',
+//                 },
+//             }}
+//             multiline
+//             fullWidth
+//             className={s.wrapText}
+//             value={value}
+//             onChange={handleChange}
+//             onKeyDown={handleKeyDown}
+//         />
+//     );
+// });
+
+
+
+
+
+
+
+const FAQ = ({ changeChatbotTab, chatbotTitle, chatbot }) => {
     const { user } = useSelector((state) => state.user);
     const [isTrue, setIsTrue] = useState(false);
     const [loading, setLoading] = useState(false);
-
+    const [expertiseId, setExpertiseId] = useState("");
     const [url, setUrl] = useState('');
 
 
-
+    // console.log(chatbot?.chatbot_id)
 
     const [faqs, setFaqs] = useState({
         "answer": {
@@ -59,26 +69,63 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
     const [data, setData] = useState([])
     const [rows, setRows] = useState([])
 
-
+    const [retrievedFields, setRetrievedFields] = useState(null);
     const { showSnackbar } = useSnackbar();
 
 
-    useEffect(() => {
-        setRows(data);
-    }, [data]);
-    useEffect(() => {
-        // Combine questions and answers into a single array of objects
-        if (faqs) {
-            const combinedData = Object.keys(faqs?.question).map((key, index) => {
+    // useEffect(() => {
+    //     setRows(data);
+    //     console.log(data)
+    // }, [data]);
+    // useEffect(() => {
+    //     setRows(data);
+    //     console.log(retrievedFields)
+    // }, [chatbotID]);
+
+    useMemo(() => {
+        if (data) {
+            const combinedData = Object.keys(data?.question || {}).map((key, index) => {
                 return {
                     id: index + 1,
-                    question: faqs.question[key],
-                    answer: faqs.answer[key] || '',
+                    question: data.question[key],
+                    answer: data.answer[key] || '',
                 };
             });
-            setData(combinedData);
+            setRows(combinedData);
         }
-    }, [faqs]);
+    }, [data]);
+
+
+
+    useEffect(() => {
+        const FAQExpertise = chatbot?.expertises.find(expertise => expertise.expertise_type === "ExpertiseType.FAQ");
+        // console.log(businessGoalExpertise)
+        if (FAQExpertise) {
+            setLoading(true);
+            get(
+                `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${FAQExpertise.chatbot_expertise_id}`,
+            ).then((response) => {
+                const { form_information, chatbot_expertise_id } = response.data;
+                // const form = JSON.parse(form_information.replace(/'/g, "\""));
+                // const { name, position } = form.business_small_talk[0];
+                setExpertiseId(chatbot_expertise_id);
+                // console.log(chatbot_expertise_id)
+                setLoading(false);
+            });
+        }
+    }, [chatbot]);
+
+
+
+
+
+
+
+
+    const saveToLocalStorage = (fields) => {
+        localStorage.setItem(`chatbot_${fields.chatbot_id}`, JSON.stringify(fields));
+    };
+
 
 
 
@@ -91,27 +138,28 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
                 faqs: rows,
             },
             is_active: 'True',
-            chatbot_id: uuidv4(),
+            chatbot_id: chatbot?.chatbot_id,
         };
         let headers = {
             'x-access-token': 'skip_validation_for_admin',
             'Content-Type': 'application/json',
         };
-
         async function postDataWithIncreasedTimeout() {
             try {
+                const expertiseId = uuidv4();
                 const response = await axios.post(
                     `https://api.chatsimple.ai/v0/users/${user.user_id
-                    }/chatbot_expertises/${uuidv4()}`,
+                    }/chatbot_expertises/${expertiseId}`,
                     fields,
                     {
                         headers,
                         timeout: 30000, // Set the timeout to 30000 milliseconds (30 seconds)
                     }
                 );
-                showSnackbar(response.data.message, 'success');
+                setExpertiseId(expertiseId)
+                showSnackbar(response.data.message);
                 setLoading(false)
-
+                saveToLocalStorage(fields);
             } catch (e) {
                 showSnackbar(e.message, 'error');
             }
@@ -119,6 +167,36 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
 
         postDataWithIncreasedTimeout();
     };
+
+    const handleUpdate = async () => {
+        setLoading(true);
+        let fields = {
+            expertise_title: 'FAQ',
+            expertise_type: 'FAQ',
+            form_information: {
+                faqs: rows,
+            },
+            is_active: 'True',
+            chatbot_id: chatbot?.chatbot_id,
+        };
+        try {
+            const response = await put(
+                `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${expertiseId}?update_mask=is_active`,
+                fields
+            );
+            setLoading(false);
+            showSnackbar("Updated Successfully");
+            saveToLocalStorage(fields);
+            //window.alert(response.data.message);
+
+        }
+        catch (e) {
+            showSnackbar(e.message, 'error')
+            // window.alert(e.message)
+        }
+    };
+
+
 
     const generateFaq = async () => {
         setLoading(true)
@@ -134,7 +212,9 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
                 { headers }
             );
 
-            setFaqs(response.data);
+            setData(response.data);
+
+            // saveToLocalStorage(response.data);
             setIsTrue(true);
             setLoading(false)
             showSnackbar('FAQ Generated successfully', 'success');
@@ -143,15 +223,22 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
         }
     };
 
-    const handleCellChange = (id, field, value) => {
-        const updatedRows = rows.map((row) => {
-            if (row.id === id) {
-                return { ...row, [field]: value };
-            }
-            return row;
-        });
-        setRows(updatedRows);
-    };
+    const handleCellChange = useCallback((id, field, value) => {
+        setRows((prevRows) =>
+            prevRows.map((row) => {
+                if (row.id === id) {
+                    return { ...row, [field]: value };
+                }
+                return row;
+            })
+        );
+    }, []);
+
+    const handleCellChangeWithParams = useCallback((id, field) => {
+        return (event) => {
+            handleCellChange(id, field, event.target.value);
+        };
+    }, [handleCellChange]);
 
 
     const columns = [
@@ -160,36 +247,74 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
             headerName: 'Question',
             flex: 1,
             renderCell: (params) => (
-                <CustomTextField
-                    id={params.id}
-                    field={params.field}
+                <TextField
+                    sx={{
+                        '& fieldset': { border: 'none' },
+                        '& .MuiInputBase-input': {
+                            whiteSpace: 'normal',
+                        },
+                        '& .Mui-focused .MuiInputBase-input': {
+                            whiteSpace: 'normal',
+                        },
+                    }}
+                    multiline
+                    fullWidth
+                    className={s.wrapText}
                     value={params.value}
-                    onChange={handleCellChange}
+                    onChange={handleCellChangeWithParams(params.id, params.field)}
+                    onKeyDown={(event) => {
+                        if (event.key === ' ') {
+                            event.stopPropagation();
+                        }
+                    }}
                 />
-            )
+            ),
         },
         {
             field: 'answer',
             headerName: 'Answer',
             flex: 2,
-            borderRight: 'none',
-            editable: 'cell',
-            sortable: false,
             renderCell: (params) => (
-                <CustomTextField
-                    id={params.id}
-                    field={params.field}
+                <TextField
+                    sx={{
+                        '& fieldset': { border: 'none' },
+                        '& .MuiInputBase-input': {
+                            whiteSpace: 'normal',
+                        },
+                        '& .Mui-focused .MuiInputBase-input': {
+                            whiteSpace: 'normal',
+                        },
+                    }}
+                    multiline
+                    fullWidth
+                    className={s.wrapText}
                     value={params.value}
-                    onChange={handleCellChange}
+                    onChange={handleCellChangeWithParams(params.id, params.field)}
+                    onKeyDown={(event) => {
+                        if (event.key === ' ') {
+                            event.stopPropagation();
+                        }
+                    }}
                 />
-            )
-            // valueGetter:handleCellEditCommit
+            ),
         },
     ];
 
 
+    // Retrieve fro local storage
+    useEffect(() => {
+        const getFromLocalStorageById = (chatbot_id) => {
+            const data = localStorage.getItem(`chatbot_${chatbot_id}`);
+            return data ? JSON.parse(data) : null;
+        };
 
+        const data = getFromLocalStorageById(chatbot?.chatbot_id);
+        setRetrievedFields(data);
+        setExpertiseId(data?.chatbot_id || '');
+        setRows(data?.form_information?.faqs || []); // Set rows to the retrieved data if available, otherwise use an empty array.
+    }, [chatbot?.chatbot_id]);
 
+    // console.log(retrievedFields)
     return (
         <div className='px-5'>
             <div className='space-y-5'>
@@ -245,10 +370,13 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
                 </div>
                 <button className='text-sm text-white px-5 w-32 h-10 bg-[#66B467] py-2 rounded-full disabled:bg-gray-200'
                     disabled={loading || rows.length === 0}
-                    onClick={buildFaq}>
+                    onClick={expertiseId ? handleUpdate : buildFaq}>
                     {loading ? <CircularProgress
                         size={16}
-                    /> : "Build"}
+                    /> :
+                        <>
+                            {expertiseId ? "Update" : "Create"}
+                        </>}
                 </button>
             </div>
         </div>
