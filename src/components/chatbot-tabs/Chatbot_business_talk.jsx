@@ -11,10 +11,10 @@ import { useSnackbar } from '../ui/MySnackbar/useSnakeBar';
 import { get, put } from '../../network';
 
 
-const Chatbot_business_talk = ({ changeChatbotTab, chatbot }) => {
+const Chatbot_business_talk = ({ changeChatbotTab, chatbot, setIsChecked }) => {
 
+    
     const [state, setState] = useState({
-        isChecked: false,
         businessName: "",
         businessHours: "",
         industry: "",
@@ -30,9 +30,7 @@ const Chatbot_business_talk = ({ changeChatbotTab, chatbot }) => {
     const { showSnackbar } = useSnackbar();
     const { user } = useSelector((state) => state.user);
 
-    const handleToggle = () => {
-        setState((prevState) => ({ ...prevState, isChecked: !prevState.isChecked }));
-    };
+
 
     useEffect(() => {
         const businessTalk = chatbot?.expertises.find(
@@ -53,7 +51,6 @@ const Chatbot_business_talk = ({ changeChatbotTab, chatbot }) => {
                     industry,
                     supportEmail,
                 } = form_information.business_small_talk[0];
-
                 setState((prevState) => ({
                     ...prevState,
                     expertiseId: chatbot_expertise_id,
@@ -112,7 +109,6 @@ const Chatbot_business_talk = ({ changeChatbotTab, chatbot }) => {
             // window.alert(response.data.message);
         } catch (e) {
             showSnackbar(e.message, "error");
-            setError(true);
             //window.alert(e.message)
         }
     };
@@ -139,14 +135,14 @@ const Chatbot_business_talk = ({ changeChatbotTab, chatbot }) => {
         };
         try {
             const response = await put(
-                `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${expertiseId}?update_mask=form_information`,
+                `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${state.expertiseId}?update_mask=form_information`,
                 fields
             );
             showSnackbar('Successfully updated')
             // setExpertiseId(expertiseId)
             setState((prevState) => ({
                 ...prevState,
-                expertiseId: expertiseId,
+                expertiseId: state.expertiseId,
                 loading: false,
             }));
             // saveToLocalStorage(fields)
