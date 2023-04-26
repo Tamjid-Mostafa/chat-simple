@@ -14,7 +14,7 @@ const Chatbot_business_goal = ({ chatbot, changeChatbotTab }) => {
     const [name, setName] = useState("")
     const [position, setPosition] = useState("")
     const [loading, setLoading] = useState(false);
-
+    const [retrievedFields, setRetrievedFields] = useState(null);
 
     const { user } = useSelector((state) => state.user);
 
@@ -44,6 +44,24 @@ const Chatbot_business_goal = ({ chatbot, changeChatbotTab }) => {
     }, [chatbot]);
 
 
+    const saveToLocalStorage = (fields) => {
+        localStorage.setItem(`chatbot_${fields.chatbot_id}`, JSON.stringify(fields));
+    };
+    // Retrieve for local storage
+    useEffect(() => {
+        const getFromLocalStorageById = (chatbot_id) => {
+            const data = localStorage.getItem(`chatbot_${chatbot_id}`);
+            return data ? JSON.parse(data) : null;
+        };
+
+        const data = getFromLocalStorageById(chatbot?.chatbot_id);
+        setRetrievedFields(data);
+        setName(name);
+        setPosition(position);
+        setExpertiseId(data?.chatbot_id || '');
+    }, [chatbot?.chatbot_id]);
+
+    console.log(retrievedFields)
 
     const handleCreate = async () => {
         setLoading(true);
@@ -70,6 +88,7 @@ const Chatbot_business_goal = ({ chatbot, changeChatbotTab }) => {
             );
             setExpertiseId(expertiseId);
             setLoading(false);
+            saveToLocalStorage(fields);
             showSnackbar(response.data.message, 'success')
             //window.alert(response.data.message);
 
@@ -129,24 +148,24 @@ const Chatbot_business_goal = ({ chatbot, changeChatbotTab }) => {
                     </p>
                 </div>
 
-                
-                    <div className='flex flex-col gap-2'>
-                        <TextField
-                            label="Name"
-                            className=''
-                            variant="outlined"
-                            value={name}
-                            onChange={(event) => setName(event.target.value)}
-                        />
-                        <TextField
-                            label="Position"
-                            className=''
-                            variant="outlined"
-                            value={position}
-                            onChange={(event) => setPosition(event.target.value)}
-                        />
-                    </div>
-                
+
+                <div className='flex flex-col gap-2'>
+                    <TextField
+                        label="Name"
+                        className=''
+                        variant="outlined"
+                        value={name}
+                        onChange={(event) => setName(event.target.value)}
+                    />
+                    <TextField
+                        label="Position"
+                        className=''
+                        variant="outlined"
+                        value={position}
+                        onChange={(event) => setPosition(event.target.value)}
+                    />
+                </div>
+
 
                 <div className=''>
                     <button className='text-sm text-white px-5 w-32 h-10 bg-[#66B467] py-2 rounded-full disabled:bg-gray-200'

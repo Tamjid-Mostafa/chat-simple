@@ -1,5 +1,5 @@
 import { TextField, CircularProgress } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
 import { useSelector } from "react-redux";
@@ -10,7 +10,7 @@ import { EditableElement } from '../EditableElement/EditableElement';
 import { useSnackbar } from '../ui/MySnackbar/useSnakeBar';
 
 
-const Chatbot_business_talk = ({ changeChatbotTab }) => {
+const Chatbot_business_talk = ({ changeChatbotTab, chatbot }) => {
 
     const [isChecked, setIsChecked] = useState(false);
     const [businessName, setBusinessName] = useState("")
@@ -27,6 +27,8 @@ const Chatbot_business_talk = ({ changeChatbotTab }) => {
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [expertiseId, setExpertiseId] = useState("");
+    const [retrievedFields, setRetrievedFields] = useState(null);
 
 
     const { showSnackbar } = useSnackbar();
@@ -46,6 +48,59 @@ const Chatbot_business_talk = ({ changeChatbotTab }) => {
         setIsChecked(!isChecked);
     };
 
+
+    useEffect(() => {
+        const businessGoalExpertise = chatbot?.expertises.find(expertise => expertise.expertise_type === "ExpertiseType.FREE_FORM");
+        // console.log(businessGoalExpertise)
+        if (businessGoalExpertise) {
+            setLoading(true);
+            get(
+                `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${businessGoalExpertise.chatbot_expertise_id}`,
+            ).then((response) => {
+                // const {  } = response.data;
+                console.log(response.data)
+                // const form = JSON.parse(form_information.replace(/'/g, "\""));
+                // const { name, position } = form.business_small_talk[0];
+                setExpertiseId(chatbot_expertise_id);
+                setBusinessName("")
+                setBusinessHours("")
+                setIndustry("")
+                setHistory("")
+                setInputs([""])
+                setSupportEmail()
+                setLoading(false);
+            });
+        }
+    }, [chatbot]);
+
+
+    const saveToLocalStorage = (fields) => {
+        localStorage.setItem(`chatbot_${fields.chatbot_id}`, JSON.stringify(fields));
+    };
+    // Retrieve for local storage
+    useEffect(() => {
+        setLoading(true);
+        const getFromLocalStorageById = (chatbot_id) => {
+            const data = localStorage.getItem(`chatbot_${chatbot_id}`);
+            return data ? JSON.parse(data) : null;
+        };
+        const data = getFromLocalStorageById(chatbot?.chatbot_id);
+
+        // const business_small_talk = chatbot?.expertises.find(expertise => expertise.expertise_type === "ExpertiseType.FREE_FORM");
+        setRetrievedFields(data);
+        setBusinessName("")
+        setBusinessHours("")
+        setIndustry("")
+        setHistory("")
+        setInputs([""])
+        setSupportEmail("")
+        setLoading(false);
+        setExpertiseId(data?.chatbot_id || '');
+    }, [chatbot?.chatbot_id]);
+
+    console.log(retrievedFields)
+
+
     const handleBusinessDetails = async () => {
         setLoading(true)
         const data = {
@@ -64,7 +119,7 @@ const Chatbot_business_talk = ({ changeChatbotTab }) => {
                 ]
             },
             is_active: "True",
-            chatbot_id: uuidv4()
+            chatbot_id: chatbot?.chatbot_id
         }
         let headers = {
             "x-access-token": "skip_validation_for_admin",
@@ -78,6 +133,7 @@ const Chatbot_business_talk = ({ changeChatbotTab }) => {
             );
             showSnackbar(response.data.message, 'success');
             setLoading(false)
+            saveToLocalStorage(data)
 
             // window.alert(response.data.message);
         }
