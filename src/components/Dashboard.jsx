@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import HomePageV2 from './HomePage/HomePageV2'
 
 const DashboardC = () => {

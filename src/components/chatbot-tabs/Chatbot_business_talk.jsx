@@ -8,165 +8,177 @@ import Add from "../../assets/images/svg/Add.svg";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import { EditableElement } from '../EditableElement/EditableElement';
 import { useSnackbar } from '../ui/MySnackbar/useSnakeBar';
+import { get, put } from '../../network';
 
 
 const Chatbot_business_talk = ({ changeChatbotTab, chatbot }) => {
 
-    const [isChecked, setIsChecked] = useState(false);
-    const [businessName, setBusinessName] = useState("")
-    const [businessHours, setBusinessHours] = useState("")
-    const [industry, setIndustry] = useState("")
-    const [history, setHistory] = useState("")
-    const [supportEmail, setSupportEmail] = useState("")
-    const [dirty, setDirty] = useState("")
-    const [inputs, setInputs] = useState([""]);
-    const [loading, setLoading] = useState(false)
-    const initialValue = "Custom Fields";
-    const [value, setValue] = useState(initialValue);
-
-    const [success, setSuccess] = useState(false);
-    const [error, setError] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState('');
-    const [expertiseId, setExpertiseId] = useState("");
-    const [retrievedFields, setRetrievedFields] = useState(null);
-
+    const [state, setState] = useState({
+        isChecked: false,
+        businessName: "",
+        businessHours: "",
+        industry: "",
+        history: "",
+        supportEmail: "",
+        inputs: [""],
+        loading: false,
+        initialValue: "Custom Fields",
+        value: "",
+        expertiseId: "",
+    });
 
     const { showSnackbar } = useSnackbar();
-
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setError(false);
-        setSuccess(false);
-    };
-
     const { user } = useSelector((state) => state.user);
 
-
     const handleToggle = () => {
-        setIsChecked(!isChecked);
+        setState((prevState) => ({ ...prevState, isChecked: !prevState.isChecked }));
     };
 
-
     useEffect(() => {
-        const businessGoalExpertise = chatbot?.expertises.find(expertise => expertise.expertise_type === "ExpertiseType.FREE_FORM");
-        // console.log(businessGoalExpertise)
-        if (businessGoalExpertise) {
-            setLoading(true);
+        const businessTalk = chatbot?.expertises.find(
+            (expertise) => expertise.expertise_type === "ExpertiseType.FREE_FORM"
+        );
+
+        if (businessTalk) {
+            setState((prevState) => ({ ...prevState, loading: true }));
             get(
-                `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${businessGoalExpertise.chatbot_expertise_id}`,
+                `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${businessTalk.chatbot_expertise_id}`
             ).then((response) => {
-                // const {  } = response.data;
-                console.log(response.data)
-                // const form = JSON.parse(form_information.replace(/'/g, "\""));
-                // const { name, position } = form.business_small_talk[0];
-                setExpertiseId(chatbot_expertise_id);
-                setBusinessName("")
-                setBusinessHours("")
-                setIndustry("")
-                setHistory("")
-                setInputs([""])
-                setSupportEmail()
-                setLoading(false);
+                const { form_information, chatbot_expertise_id } = response.data;
+                const {
+                    businessHours,
+                    businessName,
+                    custom_fields,
+                    history,
+                    industry,
+                    supportEmail,
+                } = form_information.business_small_talk[0];
+
+                setState((prevState) => ({
+                    ...prevState,
+                    expertiseId: chatbot_expertise_id,
+                    businessName: businessName,
+                    businessHours: businessHours,
+                    industry: industry,
+                    history: history,
+                    supportEmail: supportEmail,
+                    inputs: custom_fields.inputs,
+                    value: custom_fields.value,
+                    loading: false,
+                }));
             });
         }
     }, [chatbot]);
 
 
-    const saveToLocalStorage = (fields) => {
-        localStorage.setItem(`chatbot_${fields.chatbot_id}`, JSON.stringify(fields));
-    };
-    // Retrieve for local storage
-    useEffect(() => {
-        setLoading(true);
-        const getFromLocalStorageById = (chatbot_id) => {
-            const data = localStorage.getItem(`chatbot_${chatbot_id}`);
-            return data ? JSON.parse(data) : null;
-        };
-        const data = getFromLocalStorageById(chatbot?.chatbot_id);
-
-        // const business_small_talk = chatbot?.expertises.find(expertise => expertise.expertise_type === "ExpertiseType.FREE_FORM");
-        setRetrievedFields(data);
-        setBusinessName("")
-        setBusinessHours("")
-        setIndustry("")
-        setHistory("")
-        setInputs([""])
-        setSupportEmail("")
-        setLoading(false);
-        setExpertiseId(data?.chatbot_id || '');
-    }, [chatbot?.chatbot_id]);
-
-    console.log(retrievedFields)
-
-
-    const handleBusinessDetails = async () => {
-        setLoading(true)
-        const data = {
+    const handleCreate = async () => {
+        setState((prevState) => ({ ...prevState, loading: true }));
+        const fields = {
             expertise_title: "Business Small Talk",
-            expertise_type: "FAQ",
+            expertise_type: "FREE_FORM",
             form_information: {
                 business_small_talk: [
                     {
-                        businessName: businessName,
-                        businessHours: businessHours,
-                        industry: industry,
-                        history: history,
-                        supportEmail: supportEmail,
-                        custom_fields: { inputs, value }
-                    }
-                ]
+                        businessName: state.businessName,
+                        businessHours: state.businessHours,
+                        industry: state.industry,
+                        history: state.history,
+                        supportEmail: state.supportEmail,
+                        custom_fields: { inputs: state.inputs, value: state.value },
+                    },
+                ],
             },
             is_active: "True",
-            chatbot_id: chatbot?.chatbot_id
-        }
+            chatbot_id: chatbot?.chatbot_id,
+        };
         let headers = {
             "x-access-token": "skip_validation_for_admin",
-            "Content-Type": "application/json"
-        }
+            "Content-Type": "application/json",
+        };
         try {
+            const expertiseId = uuidv4();
             const response = await axios.post(
-                `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${uuidv4()}`,
-                data,
+                `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${expertiseId}`,
+                fields,
                 { headers }
             );
-            showSnackbar(response.data.message, 'success');
-            setLoading(false)
-            saveToLocalStorage(data)
-
+            showSnackbar(response.data.message, "success");
+            setState((prevState) => ({
+                ...prevState,
+                expertiseId: expertiseId,
+                loading: false,
+            }));
+            // saveToLocalStorage(fields)
             // window.alert(response.data.message);
-        }
-        catch (e) {
-            showSnackbar(e.message, 'error');
+        } catch (e) {
+            showSnackbar(e.message, "error");
             setError(true);
             //window.alert(e.message)
         }
-    }
+    };
 
+    const handleUpdate = async () => {
+        setState((prevState) => ({ ...prevState, loading: true }));
+        const fields = {
+            expertise_title: "Business Small Talk",
+            expertise_type: "FREE_FORM",
+            form_information: {
+                business_small_talk: [
+                    {
+                        businessName: state.businessName,
+                        businessHours: state.businessHours,
+                        industry: state.industry,
+                        history: state.history,
+                        supportEmail: state.supportEmail,
+                        custom_fields: { inputs: state.inputs, value: state.value },
+                    },
+                ],
+            },
+            is_active: "True",
+            chatbot_id: chatbot?.chatbot_id,
+        };
+        try {
+            const response = await put(
+                `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${expertiseId}?update_mask=form_information`,
+                fields
+            );
+            showSnackbar('Successfully updated')
+            // setExpertiseId(expertiseId)
+            setState((prevState) => ({
+                ...prevState,
+                expertiseId: expertiseId,
+                loading: false,
+            }));
+            // saveToLocalStorage(fields)
+            //window.alert(response.data.message);
 
+        }
+        catch (e) {
+            showSnackbar(e.message, 'error')
+            // window.alert(e.message)
+        }
+    };
 
 
     const handleInputChange = (e, index) => {
         const { value } = e.target;
-        const newInputs = [...inputs];
+        const newInputs = [...state.inputs];
         newInputs[index] = value;
-        setInputs(newInputs);
+        setState((prevState) => ({ ...prevState, inputs: newInputs }));
     };
     const handleChange = (value) => {
-        setValue(value);
+        setState((prevState) => ({ ...prevState, value }));
     };
 
     const handleAddInput = () => {
-        setInputs([...inputs, ""]);
+        setState((prevState) => ({ ...prevState, inputs: [...prevState.inputs, ""] }));
     };
 
     const handleRemoveInput = (index) => {
-        const newInputs = [...inputs];
+        const newInputs = [...state.inputs];
         newInputs.splice(index, 1);
-        setInputs(newInputs);
+        setState((prevState) => ({ ...prevState, inputs: newInputs }));
     };
-
 
     return (
         <>
@@ -183,8 +195,8 @@ const Chatbot_business_talk = ({ changeChatbotTab, chatbot }) => {
                     <TextField
                         label="Business Name"
                         variant="outlined"
-                        value={businessName}
-                        onChange={(event) => setBusinessName(event.target.value)}
+                        value={state.businessName}
+                        onChange={(event) => setState({ ...state, businessName: event.target.value })}
                     />
                 </div>
 
@@ -201,30 +213,30 @@ const Chatbot_business_talk = ({ changeChatbotTab, chatbot }) => {
                     <TextField
                         label="Business Hours"
                         variant="outlined"
-                        value={businessHours}
-                        onChange={(event) => setBusinessHours(event.target.value)}
+                        value={state.businessHours}
+                        onChange={(event) => setState({ ...state, businessHours: event.target.value })}
                     />
 
                     <TextField
                         label="Industry"
                         variant="outlined"
-                        value={industry}
-                        onChange={(event) => setIndustry(event.target.value)}
+                        value={state.industry}
+                        onChange={(event) => setState({ ...state, industry: event.target.value })}
                     />
 
                     <TextField
                         label="History"
                         variant="outlined"
-                        value={history}
-                        onChange={(event) => setHistory(event.target.value)}
+                        value={state.history}
+                        onChange={(event) => setState({ ...state, history: event.target.value })}
                     />
 
                     <TextField
                         label="Support Email"
                         variant="outlined"
-                        value={supportEmail}
+                        value={state.supportEmail}
                         size="small"
-                        onChange={(event) => setSupportEmail(event.target.value)}
+                        onChange={(event) => setState({ ...state, supportEmail: event.target.value })}
                     />
                 </div>
                 <button className='flex items-center gap-2 bg-[#66B467] text-xs text-white px-4 py-2.5 rounded-full' onClick={handleAddInput}>
@@ -232,26 +244,26 @@ const Chatbot_business_talk = ({ changeChatbotTab, chatbot }) => {
                     Add Field
                 </button>
 
-                {inputs.map((input, index) => (
+                {state.inputs.map((input, index) => (
                     <div key={index} className="flex items-center gap-5">
                         <div className=''>
                             <EditableElement onChange={handleChange}>
                                 <div style={{ outline: "none" }}
                                     className='flex items-center gap-3'
                                 >
-                                    <p>{initialValue}</p>
+                                    <p>{state.initialValue}</p>
                                     <DriveFileRenameOutlineIcon className='cursor-pointer'
                                     />
                                 </div>
                             </EditableElement>
                             <TextField
                                 variant="outlined"
-                                value={input}
+                                value={state.inputs[index]}
                                 size="small"
                                 onChange={(e) => handleInputChange(e, index)}
                             />
                         </div>
-                        {inputs.length >= 2 ?
+                        {state.inputs.length >= 2 ?
                             <button button type="button" onClick={() => handleRemoveInput(index)}>
                                 <img src={trash} alt="" />
                             </button> : ""}
@@ -261,21 +273,15 @@ const Chatbot_business_talk = ({ changeChatbotTab, chatbot }) => {
                 }
 
                 <div className=''>
-                    {/* <div className=''>
-                            <TextField
-                                label="Comments"
-                                variant="outlined"
-                                value={supportEmail}
-                                size="normal"
-                                onChange={(event) => setSupportEmail(event.target.value)}
-                            />
-                        </div> */}
-                    <button className='text-sm text-white px-5 w-32 h-10 bg-[#66B467] py-2 rounded-full disabled:bg-gray-200 mb-10'
-                        disabled={loading}
-                        onClick={handleBusinessDetails}>
-                        {loading ? <CircularProgress
+                    <button className='text-sm text-white px-5 w-32 h-10 bg-[#66B467] py-2 rounded-full disabled:bg-gray-200'
+                        disabled={state.loading}
+                        onClick={state.expertiseId ? handleUpdate : handleCreate}>
+                        {state.loading ? <CircularProgress
                             size={16}
-                        /> : "Create"}
+                        /> :
+                            <>
+                                {state.expertiseId ? "Update" : "Create"}
+                            </>}
                     </button>
                 </div>
             </div>

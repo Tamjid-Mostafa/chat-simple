@@ -14,7 +14,6 @@ const Chatbot_business_goal = ({ chatbot, changeChatbotTab }) => {
     const [name, setName] = useState("")
     const [position, setPosition] = useState("")
     const [loading, setLoading] = useState(false);
-    const [retrievedFields, setRetrievedFields] = useState(null);
 
     const { user } = useSelector((state) => state.user);
 
@@ -26,7 +25,7 @@ const Chatbot_business_goal = ({ chatbot, changeChatbotTab }) => {
 
     useEffect(() => {
         const businessGoalExpertise = chatbot?.expertises.find(expertise => expertise.expertise_type === "ExpertiseType.FREE_FORM");
-        // console.log(businessGoalExpertise)
+
         if (businessGoalExpertise) {
             setLoading(true);
             get(
@@ -34,7 +33,7 @@ const Chatbot_business_goal = ({ chatbot, changeChatbotTab }) => {
             ).then((response) => {
                 const { form_information, chatbot_expertise_id } = response.data;
                 // const form = JSON.parse(form_information.replace(/'/g, "\""));
-                // const { name, position } = form.business_small_talk[0];
+                const { name, position } = form_information.business_goal[0];
                 setExpertiseId(chatbot_expertise_id);
                 setName(name);
                 setPosition(position);
@@ -44,32 +43,53 @@ const Chatbot_business_goal = ({ chatbot, changeChatbotTab }) => {
     }, [chatbot]);
 
 
-    const saveToLocalStorage = (fields) => {
-        localStorage.setItem(`chatbot_${fields.chatbot_id}`, JSON.stringify(fields));
-    };
-    // Retrieve for local storage
-    useEffect(() => {
-        const getFromLocalStorageById = (chatbot_id) => {
-            const data = localStorage.getItem(`chatbot_${chatbot_id}`);
-            return data ? JSON.parse(data) : null;
-        };
+    // const saveToLocalStorage = (chatbotId, expertiseData) => {
+    //     const chatbotData = JSON.parse(localStorage.getItem(`chatbot_${chatbotId}`)) || {};
 
-        const data = getFromLocalStorageById(chatbot?.chatbot_id);
-        setRetrievedFields(data);
-        setName(name);
-        setPosition(position);
-        setExpertiseId(data?.chatbot_id || '');
-    }, [chatbot?.chatbot_id]);
+    //     if (!chatbotData.expertises) {
+    //       chatbotData.expertises = [];
+    //     }
 
-    console.log(retrievedFields)
+    //     const expertiseIndex = chatbotData.expertises.findIndex(
+    //       (expertise) => expertise.chatbot_expertise_id === expertiseData.chatbot_expertise_id
+    //     );
+
+    //     if (expertiseIndex === -1) {
+    //       chatbotData.expertises.push(expertiseData);
+    //     } else {
+    //       chatbotData.expertises[expertiseIndex] = expertiseData;
+    //     }
+
+    //     localStorage.setItem(`chatbot_${chatbotId}`, JSON.stringify(chatbotData));
+    //   };
+    // // Retrieve for local storage
+    // useEffect(() => {
+    //     const getExpertiseFromLocalStorage = (chatbotId, expertiseId) => {
+    //         const chatbotData = JSON.parse(localStorage.getItem(`chatbot_${chatbotId}`)) || {};
+
+    //         if (!chatbotData.expertises) {
+    //           return null;
+    //         }
+
+    //         return chatbotData.expertises.find((expertise) => expertise.chatbot_expertise_id === expertiseId) || null;
+    //       };
+
+    //     const data = getExpertiseFromLocalStorage(chatbot?.chatbot_id, expertiseId);
+    //     setRetrievedFields(data);
+    //     // console.log(data)
+    //     setName(name);
+    //     setPosition(position);
+    // }, [chatbot?.chatbot_id, expertiseId]);
+
+    // console.log(expertiseId)
 
     const handleCreate = async () => {
         setLoading(true);
-        let data = {
+        let fields = {
             expertise_title: "Specific domain expertise",
             expertise_type: "FREE_FORM",
             form_information: {
-                business_small_talk: [
+                business_goal: [
                     {
                         name,
                         position,
@@ -84,11 +104,16 @@ const Chatbot_business_goal = ({ chatbot, changeChatbotTab }) => {
             const expertiseId = uuidv4();
             const response = await post(
                 `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${expertiseId}`,
-                data,
+                fields,
             );
             setExpertiseId(expertiseId);
             setLoading(false);
-            saveToLocalStorage(fields);
+            // const dataToSave = {
+            //     chatbot_expertise_id: expertiseId,
+            //     ...fields,
+            //   };
+            //   saveToLocalStorage(chatbot.chatbot_id, dataToSave);
+
             showSnackbar(response.data.message, 'success')
             //window.alert(response.data.message);
 
@@ -102,11 +127,11 @@ const Chatbot_business_goal = ({ chatbot, changeChatbotTab }) => {
 
     const handleUpdate = async () => {
         setLoading(true);
-        let data = {
+        let fields = {
             expertise_title: "Specific domain expertise",
             expertise_type: "FREE_FORM",
             form_information: {
-                business_small_talk: [
+                business_goal: [
                     {
                         name,
                         position,
@@ -118,11 +143,19 @@ const Chatbot_business_goal = ({ chatbot, changeChatbotTab }) => {
         }
         try {
             const response = await put(
-                `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${expertiseId}?update_mask=is_active`,
-                data
+                `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${expertiseId}?update_mask=form_information`,
+                fields
             );
             setLoading(false);
-            showSnackbar('Successfully updated')
+            // console.log(fields)
+            // const dataToSave = {
+            //     chatbot_expertise_id: expertiseId,
+            //     ...fields,
+            //   };
+            //   saveToLocalStorage(chatbot.chatbot_id, dataToSave);
+            if (response.status === 200) {
+                showSnackbar('Successfully updated')
+            }
             //window.alert(response.data.message);
 
         }
@@ -173,7 +206,10 @@ const Chatbot_business_goal = ({ chatbot, changeChatbotTab }) => {
                         onClick={expertiseId ? handleUpdate : handleCreate}>
                         {loading ? <CircularProgress
                             size={16}
-                        /> : (expertiseId ? "Save" : "Create")}
+                        /> :
+                            <>
+                                {expertiseId ? "Update" : "Save"}
+                            </>}
                     </button>
                 </div>
             </div>

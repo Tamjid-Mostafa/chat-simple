@@ -3,6 +3,7 @@ import Chatbot from "../components/Chatbot"
 import DashboardC from "../components/Dashboard"
 import "../styles/dashboard.css"
 import Sidebar from "../components/Sidebar/Sidebar"
+import { useSelector } from "react-redux"
 
 const Dashboard = () => {
   const [dashboardTab, setDashboardTab] = useState(1)

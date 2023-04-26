@@ -55,32 +55,10 @@ const FAQ = ({ changeChatbotTab, chatbotTitle, chatbot }) => {
     const [expertiseId, setExpertiseId] = useState("");
     const [url, setUrl] = useState('');
 
-
-    // console.log(chatbot?.chatbot_id)
-
-    const [faqs, setFaqs] = useState({
-        "answer": {
-
-        },
-        "question": {
-
-        }
-    });
     const [data, setData] = useState([])
     const [rows, setRows] = useState([])
 
-    const [retrievedFields, setRetrievedFields] = useState(null);
     const { showSnackbar } = useSnackbar();
-
-
-    // useEffect(() => {
-    //     setRows(data);
-    //     console.log(data)
-    // }, [data]);
-    // useEffect(() => {
-    //     setRows(data);
-    //     console.log(retrievedFields)
-    // }, [chatbotID]);
 
     useMemo(() => {
         if (data) {
@@ -95,38 +73,20 @@ const FAQ = ({ changeChatbotTab, chatbotTitle, chatbot }) => {
         }
     }, [data]);
 
-
-
     useEffect(() => {
         const FAQExpertise = chatbot?.expertises.find(expertise => expertise.expertise_type === "ExpertiseType.FAQ");
-        // console.log(businessGoalExpertise)
         if (FAQExpertise) {
             setLoading(true);
             get(
                 `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${FAQExpertise.chatbot_expertise_id}`,
             ).then((response) => {
                 const { form_information, chatbot_expertise_id } = response.data;
-                // const form = JSON.parse(form_information.replace(/'/g, "\""));
-                // const { name, position } = form.business_small_talk[0];
+                setRows(form_information.faqs)
                 setExpertiseId(chatbot_expertise_id);
-                // console.log(chatbot_expertise_id)
                 setLoading(false);
             });
         }
     }, [chatbot]);
-
-
-
-
-
-
-
-
-    const saveToLocalStorage = (fields) => {
-        localStorage.setItem(`chatbot_${fields.chatbot_id}`, JSON.stringify(fields));
-    };
-
-
 
 
     const buildFaq = async () => {
@@ -159,7 +119,6 @@ const FAQ = ({ changeChatbotTab, chatbotTitle, chatbot }) => {
                 setExpertiseId(expertiseId)
                 showSnackbar(response.data.message);
                 setLoading(false)
-                saveToLocalStorage(fields);
             } catch (e) {
                 showSnackbar(e.message, 'error');
             }
@@ -186,18 +145,12 @@ const FAQ = ({ changeChatbotTab, chatbotTitle, chatbot }) => {
             );
             setLoading(false);
             showSnackbar("Updated Successfully");
-            saveToLocalStorage(fields);
-            //window.alert(response.data.message);
-
         }
         catch (e) {
             showSnackbar(e.message, 'error')
-            // window.alert(e.message)
         }
     };
-
-
-
+    
     const generateFaq = async () => {
         setLoading(true)
         try {
@@ -205,16 +158,14 @@ const FAQ = ({ changeChatbotTab, chatbotTitle, chatbot }) => {
                 'x-access-token': 'skip_validation_for_admin',
                 'Content-Type': 'application/json',
             };
-
+    
             const response = await axios.post(
                 `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/extractfaq`,
                 { url: url },
                 { headers }
             );
-
+    
             setData(response.data);
-
-            // saveToLocalStorage(response.data);
             setIsTrue(true);
             setLoading(false)
             showSnackbar('FAQ Generated successfully', 'success');
@@ -222,7 +173,7 @@ const FAQ = ({ changeChatbotTab, chatbotTitle, chatbot }) => {
             showSnackbar(error.message, 'error');
         }
     };
-
+    
     const handleCellChange = useCallback((id, field, value) => {
         setRows((prevRows) =>
             prevRows.map((row) => {
@@ -233,12 +184,14 @@ const FAQ = ({ changeChatbotTab, chatbotTitle, chatbot }) => {
             })
         );
     }, []);
-
+    
     const handleCellChangeWithParams = useCallback((id, field) => {
         return (event) => {
             handleCellChange(id, field, event.target.value);
         };
     }, [handleCellChange]);
+    
+   
 
 
     const columns = [
@@ -299,22 +252,8 @@ const FAQ = ({ changeChatbotTab, chatbotTitle, chatbot }) => {
             ),
         },
     ];
+    
 
-
-    // Retrieve fro local storage
-    useEffect(() => {
-        const getFromLocalStorageById = (chatbot_id) => {
-            const data = localStorage.getItem(`chatbot_${chatbot_id}`);
-            return data ? JSON.parse(data) : null;
-        };
-
-        const data = getFromLocalStorageById(chatbot?.chatbot_id);
-        setRetrievedFields(data);
-        setExpertiseId(data?.chatbot_id || '');
-        setRows(data?.form_information?.faqs || []); // Set rows to the retrieved data if available, otherwise use an empty array.
-    }, [chatbot?.chatbot_id]);
-
-    // console.log(retrievedFields)
     return (
         <div className='px-5'>
             <div className='space-y-5'>
