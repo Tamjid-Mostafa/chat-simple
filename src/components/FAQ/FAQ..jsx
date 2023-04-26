@@ -271,13 +271,13 @@ const FAQ = ({ changeChatbotTab, chatbotTitle, chatbot }) => {
                         />
                     </div>
                     <div className=''>
-                        <button className='text-sm text-white px-5 w-32 h-10 bg-[#66B467] py-2 rounded-full disabled:bg-gray-200'
+                        <div className='cursor-pointer text-sm text-white px-5 w-32 h-10 bg-[#66B467] py-2 rounded-full disabled:bg-gray-200'
                             disabled={loading || chatbotTitle === ''}
                             onClick={generateFaq}>
                             {loading ? <CircularProgress
                                 size={16}
                             /> : "Import FAQ"}
-                        </button>
+                        </div>
                     </div>
                 </div>
 
@@ -307,7 +307,7 @@ const FAQ = ({ changeChatbotTab, chatbotTitle, chatbot }) => {
                         />
                     </Box>
                 </div>
-                <button className='text-sm text-white px-5 w-32 h-10 bg-[#66B467] py-2 rounded-full disabled:bg-gray-200'
+                <div className='cursor-pointer text-sm text-white px-5 w-32 h-10 bg-[#66B467] py-2 rounded-full disabled:bg-gray-200'
                     disabled={loading || rows.length === 0}
                     onClick={expertiseId ? handleUpdate : buildFaq}>
                     {loading ? <CircularProgress
@@ -316,7 +316,7 @@ const FAQ = ({ changeChatbotTab, chatbotTitle, chatbot }) => {
                         <>
                             {expertiseId ? "Update" : "Create"}
                         </>}
-                </button>
+                </div>
             </div>
         </div>
     );
