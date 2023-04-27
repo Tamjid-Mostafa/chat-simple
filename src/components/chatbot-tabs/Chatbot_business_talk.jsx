@@ -11,61 +11,63 @@ import { useSnackbar } from '../ui/MySnackbar/useSnakeBar';
 import { get, put } from '../../network';
 
 
-const Chatbot_business_talk = ({ changeChatbotTab, chatbot, setIsChecked }) => {
+const Chatbot_business_talk = ({ changeChatbotTab, setIsChecked }) => {
 
-    
+    const { chatbot } = useSelector((state) => state.chatbot)
+    const { user } = useSelector((state) => state.user);
     const [state, setState] = useState({
         businessName: "",
         businessHours: "",
         industry: "",
         history: "",
         supportEmail: "",
-        inputs: [""],
+        inputs: [{ label: "Custom Fields", value: "" }],
         loading: false,
-        initialValue: "Custom Fields",
-        value: "",
         expertiseId: "",
     });
-
     const { showSnackbar } = useSnackbar();
-    const { user } = useSelector((state) => state.user);
 
 
 
     useEffect(() => {
-        const businessTalk = chatbot?.expertises.find(
-            (expertise) => expertise.expertise_type === "ExpertiseType.BUSINESS_SMALL_TALK"
-        );
+        if (chatbot) {
+            const businessTalk = chatbot.expertises.find(
+                (expertise) => expertise.expertise_type === "ExpertiseType.BUSINESS_SMALL_TALK"
+            );
 
-        if (businessTalk) {
-            setState((prevState) => ({ ...prevState, loading: true }));
-            get(
-                `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${businessTalk.chatbot_expertise_id}`
-            ).then((response) => {
-                const { form_information, chatbot_expertise_id } = response.data;
-                const {
-                    businessHours,
-                    businessName,
-                    custom_fields,
-                    history,
-                    industry,
-                    supportEmail,
-                } = form_information.business_small_talk[0];
-                setState((prevState) => ({
-                    ...prevState,
-                    expertiseId: chatbot_expertise_id,
-                    businessName: businessName,
-                    businessHours: businessHours,
-                    industry: industry,
-                    history: history,
-                    supportEmail: supportEmail,
-                    inputs: custom_fields.inputs,
-                    value: custom_fields.value,
-                    loading: false,
-                }));
-            });
+            if (businessTalk) {
+                setState((prevState) => ({ ...prevState, loading: true }));
+                get(
+                    `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${businessTalk.chatbot_expertise_id}`
+                ).then((response) => {
+                    const { form_information, chatbot_expertise_id } = response.data;
+                    const {
+                        businessHours,
+                        businessName,
+                        custom_fields,
+                        history,
+                        industry,
+                        supportEmail,
+                    } = form_information.business_small_talk[0];
+                    setState((prevState) => ({
+                        ...prevState,
+                        expertiseId: chatbot_expertise_id,
+                        businessName: businessName,
+                        businessHours: businessHours,
+                        industry: industry,
+                        history: history,
+                        supportEmail: supportEmail,
+                        inputs: custom_fields, // Updated line
+                        loading: false,
+                    }));
+                    
+                });
+            }
         }
     }, [chatbot]);
+
+
+
 
 
     const handleCreate = async () => {
@@ -81,7 +83,7 @@ const Chatbot_business_talk = ({ changeChatbotTab, chatbot, setIsChecked }) => {
                         industry: state.industry,
                         history: state.history,
                         supportEmail: state.supportEmail,
-                        custom_fields: { inputs: state.inputs, value: state.value },
+                        custom_fields: state.inputs, // Updated line
                     },
                 ],
             },
@@ -126,7 +128,7 @@ const Chatbot_business_talk = ({ changeChatbotTab, chatbot, setIsChecked }) => {
                         industry: state.industry,
                         history: state.history,
                         supportEmail: state.supportEmail,
-                        custom_fields: { inputs: state.inputs, value: state.value },
+                        custom_fields: state.inputs, // Updated line
                     },
                 ],
             },
@@ -156,19 +158,26 @@ const Chatbot_business_talk = ({ changeChatbotTab, chatbot, setIsChecked }) => {
     };
 
 
-    const handleInputChange = (e, index) => {
-        const { value } = e.target;
+    const handleInputChange = (content, index, type) => {
         const newInputs = [...state.inputs];
-        newInputs[index] = value;
+        if (type === "label") {
+            newInputs[index].label = content;
+        } else if (type === "value") {
+            newInputs[index].value = content;
+        }
         setState((prevState) => ({ ...prevState, inputs: newInputs }));
-    };
-    const handleChange = (value) => {
-        setState((prevState) => ({ ...prevState, value }));
     };
 
     const handleAddInput = () => {
-        setState((prevState) => ({ ...prevState, inputs: [...prevState.inputs, ""] }));
+        setState((prevState) => ({
+            ...prevState,
+            inputs: [
+                ...prevState.inputs,
+                { label: "Custom Field", value: "" }, // Change this line
+            ],
+        }));
     };
+
 
     const handleRemoveInput = (index) => {
         const newInputs = [...state.inputs];
@@ -243,20 +252,19 @@ const Chatbot_business_talk = ({ changeChatbotTab, chatbot, setIsChecked }) => {
                 {state.inputs.map((input, index) => (
                     <div key={index} className="flex items-center gap-5">
                         <div className=''>
-                            <EditableElement onChange={handleChange}>
-                                <div style={{ outline: "none" }}
-                                    className='flex items-center gap-3'
-                                >
-                                    <p>{state.initialValue}</p>
-                                    <DriveFileRenameOutlineIcon className='cursor-pointer'
-                                    />
+                            <EditableElement onChange={(content) => handleInputChange(content, index, "label")}>
+                                <div style={{ outline: "none" }} className="flex items-center gap-3">
+                                    <p>{state.inputs[index].label}</p>
+                                    <DriveFileRenameOutlineIcon className="cursor-pointer" />
                                 </div>
                             </EditableElement>
+
                             <TextField
                                 variant="outlined"
-                                value={state.inputs[index]}
+                                value={state.inputs[index].value}
                                 size="small"
-                                onChange={(e) => handleInputChange(e, index)}
+                                InputProps={{ style: { outline: "none" } }}
+                                onChange={(event) => handleInputChange(event.target.value, index, "value")} // Update this line
                             />
                         </div>
                         {state.inputs.length >= 2 ?
@@ -265,8 +273,8 @@ const Chatbot_business_talk = ({ changeChatbotTab, chatbot, setIsChecked }) => {
                             </button> : ""}
 
                     </div>
-                ))
-                }
+                ))}
+
 
                 <div className=''>
                     <button className='text-sm text-white px-5 w-32 h-10 bg-[#66B467] py-2 rounded-full disabled:bg-gray-200'

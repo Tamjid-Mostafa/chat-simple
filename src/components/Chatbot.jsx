@@ -4,7 +4,7 @@ import Chatbot_tab_2_new from './chatbot-tabs/Chatbot_tab_2_new';
 import Chatbot_faq_details from './chatbot-tabs/Chatbot_faq_details';
 import Chatbot_business_talk from './chatbot-tabs/Chatbot_business_talk';
 import Chatbot_business_goal from './chatbot-tabs/Chatbot_business_goal';
-import {ChatbotEscalation} from './chatbot-tabs/ChatbotEscalation';
+import { ChatbotEscalation } from './chatbot-tabs/ChatbotEscalation';
 import Chatbotfinish from './Chatbotfinish/Chatbotfinish';
 import CreateChatbotLast from './CreateChatbotLast/CreateChatbotLast';
 import { useDispatch, useSelector } from 'react-redux';
@@ -32,34 +32,39 @@ const Chatbot = () => {
     }
   }, [userData, loading]);
   const changeChatbotTab = (tab) => {
+
     setChatbotTab(tab);
   };
   const backChatbotTab = () => {
-    if(chatbotTab > 1) {
-      setChatbotTab(chatbotTab-1);
+    if (chatbotTab > 1) {
+      setChatbotTab(chatbotTab - 1);
     }
   };
-  
+
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
   const { chatbots } = useSelector((state) => state.chatbot); // this has all the chat-bots list for a user that is logged in
-  const { chatbot } = useSelector((state) => state.chatbot)
-
-  // console.log(chatbot)
-
+  
 
   
+
+  const [isChecked, setIsChecked] = useState(false)
+
+
   const [isTyping, setIsTyping] = useState(false);
   const [chatbotTitle, setChatbotTitle] = useState('');
   const [prevTitle, setPrevTitle] = useState('');
   const [chatbotID, setChatbotID] = useState('');
+  const [isChatbot, setISChatbot] = useState();
 
   const [platforms, setPlatforms] = useState([]);
+  const [expertises, setExpertises] = useState([]);
 
 
-  useEffect(()=>{
+  useEffect(() => {
+    if (!chatbotID || chatbotID === "" || !user.user_id) return;
     if (chatbotID && user.user_id) {
-      dispatch(getChatbot({userID: user.user_id, chatbotID}));
+      dispatch(getChatbot({ userID: user.user_id, chatbotID }));
     }
   }, [chatbotID, user.id]);
 
@@ -68,6 +73,36 @@ const Chatbot = () => {
   // useEffect(() => {
   //   setPrevTitle(chatbotTitle);
   // }, [chatbotTitle])
+
+  const { chatbot } = useSelector((state) => state.chatbot)
+  useEffect(() => {
+    if (!chatbotID || chatbotID === "" || !user.user_id) return;
+    if (chatbotID && user.user_id) {
+      setISChatbot(chatbot)
+    }
+  }, [chatbotID, user.id]);
+
+
+  useEffect(() => {
+    if (!chatbotID || chatbotID === "" || !user.user_id) return;
+    if (isChatbot && isChatbot.expertises) {
+      const updatedExpertises = isChatbot.expertises.reduce((acc, expertise) => {
+        if (expertise.expertise_type === 'ExpertiseType.FAQ') {
+          return [...acc, 3];
+        } else if (expertise.expertise_type === 'ExpertiseType.BUSINESS_SMALL_TALK') {
+          return [...acc, 4];
+        } else if (expertise.expertise_type === 'ExpertiseType.FREE_FORM') {
+          return [...acc, 5];
+        }
+        return acc;
+      }, []);
+  
+      setExpertises(updatedExpertises);
+    }
+  }, [isChatbot]);
+
+  // console.log(isChatbot)
+
 
 
   const listItemsData =
@@ -88,18 +123,22 @@ const Chatbot = () => {
       {
         id: 3,
         name: 'FAQs',
+        checked: isChecked,
       },
       {
         id: 4,
         name: 'Company Specific Talk',
+        checked: isChecked,
       },
       {
         id: 5,
         name: 'Industry Expert',
+        checked: isChecked,
       },
       {
         id: 6,
         name: 'Escalation',
+        checked: isChecked,
       },
     ],
 
@@ -118,12 +157,12 @@ const Chatbot = () => {
     };
     setChatbotID(data.chatbotID);
     dispatch(createChatbot(data))
-    .then(()=> {
-      showSnackbar('Created Successfully', 'success')
-    })
-    .catch((error) => {
-      console.error('Error handling delete:', error);
-    });
+      .then(() => {
+        showSnackbar('Created Successfully', 'success')
+      })
+      .catch((error) => {
+        console.error('Error handling delete:', error);
+      });
   }
 
   const UpdateChatbot = () => {
@@ -136,16 +175,28 @@ const Chatbot = () => {
       update_mask: 'chatbot_title',
     };
     dispatch(updateChatbot(data))
-    .then(()=> {
-      showSnackbar('Updated Successfully', 'success')
-    })
-    .catch((error) => {
-      console.error('Error handling delete:', error);
-    });
-    
+      .then(() => {
+        showSnackbar('Updated Successfully', 'success')
+      })
+      .catch((error) => {
+        console.error('Error handling delete:', error);
+      });
+
   }
 
-  
+
+  const handleExpertise = (id) => {
+    if (!chatbotID) {
+      showSnackbar('Create chatbot name', 'error')
+      return;
+    }
+    changeChatbotTab(id)
+    if (expertises.includes(id)) {
+      setExpertises(expertises.filter(expertiseId => expertiseId !== id));
+    } else {
+      setExpertises([...expertises, id]);
+    }
+  }
 
 
   const handlePlatform = (value) => {
@@ -182,7 +233,7 @@ const Chatbot = () => {
         platforms:
           copyPlatform?.length === 0
             ? null
-            : {first: copyPlatform[0], second: copyPlatform[1]} ,
+            : { first: copyPlatform[0], second: copyPlatform[1] },
       },
       chatbotID: chatbotID,
       update_mask: 'platforms',
@@ -256,17 +307,45 @@ const Chatbot = () => {
 
               <div className='mt-5'>
                 <h2 className='bold_text'>Select Chatbot Expertise</h2>
-
                 {
                   listItemsData?.chatBotExpertise?.map((item, i) =>
                     <ListItem
                       key={item.id}
                       id={item.id}
-                      handleClick={changeChatbotTab}
+                      checked={expertises.includes(item.id)}
+                      handleClick={() => handleExpertise(item.id)}
                     >
                       {item.name}
                     </ListItem>)
                 }
+                {/* <ListItem
+                  id={3}
+                  // checked={isChecked}
+                  handleClick={() => handleExpertise(3)}
+                >
+                  FAQs
+                </ListItem>
+                <ListItem
+                  id={4}
+                  // checked={isChecked}
+                  handleClick={() => handleExpertise(4)}
+                >
+                  Company Specific Talk
+                </ListItem>
+                <ListItem
+                  id={5}
+                  // checked={isChecked}
+                  handleClick={() => handleExpertise(5)}
+                >
+                  Industry Expert
+                </ListItem>
+                <ListItem
+                  id={6}
+                  // checked={isChecked}
+                  handleClick={() => handleExpertise(6)}
+                >
+                  Escalation
+                </ListItem> */}
               </div>
             </div>
 
@@ -292,29 +371,32 @@ const Chatbot = () => {
                 changeChatbotTab={changeChatbotTab}
                 user={userData}
                 chatbotID={chatbotID}
-                chatbot={chatbot}
+                // chatbot={chatbot}
                 chatbotTitle={chatbotTitle}
+                setIsChecked={setIsChecked}
               />
             )}
             {chatbotTab === 4 && (
               <Chatbot_business_talk
                 changeChatbotTab={changeChatbotTab}
                 user={userData}
-                chatbot ={chatbot}
+                // chatbot={chatbot}
+                setIsChecked={setIsChecked}
               />
             )}
             {chatbotTab === 5 && (
               <Chatbot_business_goal
-                chatbot ={chatbot}
+                // chatbot={chatbot}
                 changeChatbotTab={changeChatbotTab}
                 user={userData}
+                setIsChecked={setIsChecked}
               />
             )}
             {chatbotTab === 6 && (
               <ChatbotEscalation
                 changeChatbotTab={changeChatbotTab}
                 user={userData}
-                chatbot ={chatbot}
+                // chatbot={chatbot}
               />
             )}
             {chatbotTab === 7 && (

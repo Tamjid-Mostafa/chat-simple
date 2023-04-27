@@ -48,7 +48,8 @@ import { get, put } from '../../network';
 
 
 
-const FAQ = ({ changeChatbotTab, chatbotTitle, chatbot }) => {
+const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
+    const { chatbot } = useSelector((state) => state.chatbot)
     const { user } = useSelector((state) => state.user);
     const [isTrue, setIsTrue] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -84,6 +85,7 @@ const FAQ = ({ changeChatbotTab, chatbotTitle, chatbot }) => {
                 setRows(form_information.faqs)
                 setExpertiseId(chatbot_expertise_id);
                 setLoading(false);
+                
             });
         }
     }, [chatbot]);
@@ -270,15 +272,15 @@ const FAQ = ({ changeChatbotTab, chatbotTitle, chatbot }) => {
                             disabled={chatbotTitle === '' && true}
                         />
                     </div>
-                    <button className=''>
-                        <div className='cursor-pointer text-sm text-white px-5 w-32 h-10 bg-[#66B467] py-2 rounded-full disabled:bg-gray-200'
+                    <div className=''>
+                        <button className=' text-sm text-white px-5 w-32 h-10 bg-[#66B467] py-2 rounded-full disabled:bg-gray-200'
                             disabled={loading || chatbotTitle === ''}
                             onClick={generateFaq}>
                             {loading ? <CircularProgress
                                 size={16}
                             /> : "Import FAQ"}
-                        </div>
-                    </button>
+                        </button>
+                    </div>
                 </div>
 
                 <div className='mr-5'>
@@ -307,8 +309,8 @@ const FAQ = ({ changeChatbotTab, chatbotTitle, chatbot }) => {
                         />
                     </Box>
                 </div>
-                <button className='cursor-pointer text-sm text-white px-5 w-32 h-10 bg-[#66B467] py-2 rounded-full disabled:bg-gray-200'
-                    disabled={loading || rows.length === 0}
+                <button className=' text-sm text-white px-5 w-32 h-10 bg-[#66B467] py-2 rounded-full disabled:bg-gray-200'
+                    disabled={loading || rows?.length === 0}
                     onClick={expertiseId ? handleUpdate : buildFaq}>
                     {loading ? <CircularProgress
                         size={16}

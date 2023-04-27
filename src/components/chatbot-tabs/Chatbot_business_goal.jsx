@@ -8,7 +8,8 @@ import { useSelector } from "react-redux";
 import { post, get, put } from '../../network';
 import { useSnackbar } from '../ui/MySnackbar/useSnakeBar';
 
-const Chatbot_business_goal = ({ chatbot, changeChatbotTab }) => {
+const Chatbot_business_goal = ({ changeChatbotTab }) => {
+    const { chatbot } = useSelector((state) => state.chatbot)
     const [expertiseId, setExpertiseId] = useState("");
     const [isChecked, setIsChecked] = useState(false);
     const [name, setName] = useState("")

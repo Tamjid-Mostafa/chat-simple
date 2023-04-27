@@ -73,7 +73,7 @@ const Chatbot_tab_1 = ({ changeChatbotTab, setChatbotTitle, setChatbotID }) => {
               {chatbots ? (
                 <div className='chat__simple__main2 pt-10 mt-10'>
                   <div className=''>
-                    <div className='grid xl:grid-cols-4 grid-cols-1 gap-10'>
+                    <div className='grid 2xl:grid-cols-3 xl:grid-cols-2 grid-cols-1 gap-10'>
                       {chatbots?.chatbot?.map((bot) => (
                         <BootCard
                           key={bot.chatbot_id}

@@ -7,7 +7,7 @@ const BootCard = ({ changeChatbotTab, bot, setChatbotTitle, setChatbotID, handle
 
 
   const edit = () => {
-    changeChatbotTab(2)
+    changeChatbotTab(3)
     setChatbotTitle(bot?.chatbot_title)
     setChatbotID(bot?.chatbot_id)
   }
@@ -15,14 +15,13 @@ const BootCard = ({ changeChatbotTab, bot, setChatbotTitle, setChatbotID, handle
   const types = [];
   const expertiseTypes = [
     { type: 'FAQ', name: 'FAQ' },
-    { type: 'BUSINSESS_SMALL_TALK', name: 'Business small talk' },
-    { type: 'PRE_QUALIFICATION_QUESTIONS', name: 'Pre qualification qustion' },
-    { type: 'INFORMATION_GATHERIG', name: 'Information gathering' },
+    { type: 'BUSINESS_SMALL_TALK', name: 'Business small talk' },
+    { type: 'PRE_QUALIFICATION_QUESTIONS', name: 'Pre qualification question' },
+    { type: 'INFORMATION_GATHERING', name: 'Information gathering' },
     { type: 'PRODUCT_RECOMMENDATION', name: 'Product recommendation' },
     { type: 'ESCALATION', name: 'Escalation' },
     { type: 'FREE_FORM', name: 'Free Form' },
   ];
-
 
   // filter expertises type
   bot?.expertises?.forEach((el) => {
@@ -35,7 +34,7 @@ const BootCard = ({ changeChatbotTab, bot, setChatbotTitle, setChatbotID, handle
 
   return (
     <>
-      <div className='border rounded-xl w-[350px] h-[480px] flex flex-col justify-between'>
+      <div className='border rounded-xl w-[350px] h-[520px] flex flex-col justify-between'>
         <div>
           <div className='flex justify-between p-4'>
             <div className='flex items-center  gap-3'>
@@ -45,10 +44,6 @@ const BootCard = ({ changeChatbotTab, bot, setChatbotTitle, setChatbotID, handle
                 <p className='text-sm'>Messenger</p>
               </div>
             </div>
-            {/* <div>
-            <img src={barIcon} className='cursor-pointer' alt='' />
-          </div> */}
-
             <div className=''>
               <Switch />
             </div>
@@ -56,21 +51,30 @@ const BootCard = ({ changeChatbotTab, bot, setChatbotTitle, setChatbotID, handle
           <div className='my-5 '>
             <img src={displayimg} alt='My Image' />
           </div>
+          
           <div className='mx-5'>
             <p>
               {bot?.expertises?.length} expertise enabled
             </p>
           </div>
+          <div className='my-5 mx-5'>
+            {types.map((type, index) => (
+              <span key={index}>
+                {index > 0 && (index === types?.length - 1 ? ' and ' : ', ')}
+                {type}
+              </span>
+            ))}
+          </div>
         </div>
         <div className='flex justify-end items-end my-5 mx-5 gap-5'>
           <button className='text-sm text-white px-5 bg-[#66B467] py-2 rounded-full'
-          onClick={edit}
+            onClick={edit}
           >
             Edit
           </button>
 
           <button
-            onClick={()=>handleDelete(bot)}
+            onClick={() => handleDelete(bot)}
             className='text-sm text-white px-5 bg-[#66B467] py-2 rounded-full'
           >
             Delete
