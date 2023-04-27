@@ -66,7 +66,7 @@ const Chatbot = () => {
     if (chatbotID && user.user_id) {
       dispatch(getChatbot({ userID: user.user_id, chatbotID }));
     }
-  }, [chatbotID, user.id]);
+  }, [chatbotID, user.user_id]);
 
   // const [chatbot, setChatbot] = useState({})
 
@@ -80,12 +80,12 @@ const Chatbot = () => {
     if (chatbotID && user.user_id) {
       setISChatbot(chatbot)
     }
-  }, [chatbotID, user.id]);
+  }, [chatbotID, user.user_id]);
 
 
   useEffect(() => {
-    if (!chatbotID || chatbotID === "" || !user.user_id) return;
-    if (isChatbot && isChatbot.expertises) {
+    // if (!chatbotID || chatbotID === "" || !user.user_id) return;
+    if (isChatbot && isChatbot.expertises && isChatbot.expertises.length > 0) {
       const updatedExpertises = isChatbot.expertises.reduce((acc, expertise) => {
         if (expertise.expertise_type === 'ExpertiseType.FAQ') {
           return [...acc, 3];
@@ -101,7 +101,7 @@ const Chatbot = () => {
     }
   }, [isChatbot]);
 
-  // console.log(isChatbot)
+  console.log(isChatbot)
 
 
 
