@@ -45,7 +45,9 @@ const BootCard = ({ changeChatbotTab, bot, setChatbotTitle, setChatbotID, handle
               </div>
             </div>
             <div className=''>
-              <Switch />
+              <Switch 
+              checked={types?.length > 0}
+              />
             </div>
           </div>
           <div className='my-5 '>

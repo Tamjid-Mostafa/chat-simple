@@ -19,9 +19,54 @@ import FAQ from './FAQ/FAQ.';
 import { createChatbot, createChatBot, getChatbot, updateChatbot, updateChatBot } from '../redux/reducers/chatbotSlice';
 import { useSnackbar } from './ui/MySnackbar/useSnakeBar';
 
+const listItemsData =
+{
+  channels: [
+    {
+      name: 'Messenger',
+      img: messenger,
+      slug: 'messenger'
+    },
+    {
+      name: 'Instagram',
+      img: instagram,
+      slug: 'instagram'
+    },
+  ],
+  chatBotExpertise: [
+    {
+      id: 3,
+      name: 'FAQs',
+    },
+    {
+      id: 4,
+      name: 'Company Specific Talk',
+    },
+    {
+      id: 5,
+      name: 'Industry Expert',
+    },
+    {
+      id: 6,
+      name: 'Escalation',
+    },
+  ],
+
+}
+
+
 const Chatbot = () => {
   const { showSnackbar } = useSnackbar();
   const [chatbotTab, setChatbotTab] = React.useState(1);
+  const [isChecked, setIsChecked] = useState(false)
+
+
+  const [isTyping, setIsTyping] = useState(false);
+  const [chatbotTitle, setChatbotTitle] = useState('');
+  const [chatbotID, setChatbotID] = useState(null);
+
+  const [platforms, setPlatforms] = useState([]);
+  const [expertises, setExpertises] = useState([]);
   const { loading, user: userData } = useSelector((state) => {
     return state.auth;
   });
@@ -44,29 +89,18 @@ const Chatbot = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
   const { chatbots } = useSelector((state) => state.chatbot); // this has all the chat-bots list for a user that is logged in
-  
-
-  
-
-  const [isChecked, setIsChecked] = useState(false)
 
 
-  const [isTyping, setIsTyping] = useState(false);
-  const [chatbotTitle, setChatbotTitle] = useState('');
-  const [prevTitle, setPrevTitle] = useState('');
-  const [chatbotID, setChatbotID] = useState('');
-  const [isChatbot, setISChatbot] = useState();
-
-  const [platforms, setPlatforms] = useState([]);
-  const [expertises, setExpertises] = useState([]);
 
 
-  useEffect(() => {
-    if (!chatbotID || chatbotID === "" || !user.user_id) return;
-    if (chatbotID && user.user_id) {
-      dispatch(getChatbot({ userID: user.user_id, chatbotID }));
-    }
-  }, [chatbotID, user.user_id]);
+
+
+  // useEffect(() => {
+  //   if (!chatbotID || chatbotID === "" || !user.user_id) return;
+  //   if (chatbotID && user.user_id) {
+  //     dispatch(getChatbot({ userID: user.user_id, chatbotID }));
+  //   }
+  // }, [chatbotID, user.user_id]);
 
   // const [chatbot, setChatbot] = useState({})
 
@@ -74,75 +108,38 @@ const Chatbot = () => {
   //   setPrevTitle(chatbotTitle);
   // }, [chatbotTitle])
 
-  const { chatbot } = useSelector((state) => state.chatbot)
-  useEffect(() => {
-    if (!chatbotID || chatbotID === "" || !user.user_id) return;
-    if (chatbotID && user.user_id) {
-      setISChatbot(chatbot)
-    }
-  }, [chatbotID, user.user_id]);
+  // const { chatbot } = useSelector((state) => state.chatbot)
+  // useEffect(() => {
+  //   if (!chatbotID || chatbotID === "" || !user.user_id) return;
+  //   if (chatbotID && user.user_id) {
+  //     setISChatbot(chatbot)
+  //   }
+  // }, [chatbotID, user.user_id]);
 
 
-  useEffect(() => {
-    // if (!chatbotID || chatbotID === "" || !user.user_id) return;
-    if (isChatbot && isChatbot.expertises && isChatbot.expertises.length > 0) {
-      const updatedExpertises = isChatbot.expertises.reduce((acc, expertise) => {
-        if (expertise.expertise_type === 'ExpertiseType.FAQ') {
-          return [...acc, 3];
-        } else if (expertise.expertise_type === 'ExpertiseType.BUSINESS_SMALL_TALK') {
-          return [...acc, 4];
-        } else if (expertise.expertise_type === 'ExpertiseType.FREE_FORM') {
-          return [...acc, 5];
-        }
-        return acc;
-      }, []);
-  
-      setExpertises(updatedExpertises);
-    }
-  }, [isChatbot]);
+  // useEffect(() => {
+  //   // if (!chatbotID || chatbotID === "" || !user.user_id) return;
+  //   if (isChatbot && isChatbot.expertises && isChatbot.expertises.length > 0) {
+  //     const updatedExpertises = isChatbot.expertises.reduce((acc, expertise) => {
+  //       if (expertise.expertise_type === 'ExpertiseType.FAQ') {
+  //         return [...acc, 3];
+  //       } else if (expertise.expertise_type === 'ExpertiseType.BUSINESS_SMALL_TALK') {
+  //         return [...acc, 4];
+  //       } else if (expertise.expertise_type === 'ExpertiseType.FREE_FORM') {
+  //         return [...acc, 5];
+  //       }
+  //       return acc;
+  //     }, []);
 
-  console.log(isChatbot)
+  //     setExpertises(updatedExpertises);
+  //   }
+  // }, [isChatbot]);
+
+  // console.log(isChatbot)
 
 
 
-  const listItemsData =
-  {
-    channels: [
-      {
-        name: 'Messenger',
-        img: messenger,
-        slug: 'messenger'
-      },
-      {
-        name: 'Instagram',
-        img: instagram,
-        slug: 'instagram'
-      },
-    ],
-    chatBotExpertise: [
-      {
-        id: 3,
-        name: 'FAQs',
-        checked: isChecked,
-      },
-      {
-        id: 4,
-        name: 'Company Specific Talk',
-        checked: isChecked,
-      },
-      {
-        id: 5,
-        name: 'Industry Expert',
-        checked: isChecked,
-      },
-      {
-        id: 6,
-        name: 'Escalation',
-        checked: isChecked,
-      },
-    ],
 
-  }
 
 
   const CreateChatbot = () => {
@@ -166,7 +163,6 @@ const Chatbot = () => {
   }
 
   const UpdateChatbot = () => {
-    setPrevTitle(chatbotTitle);
     // update here
     const data = {
       userID: user?.user_id,
@@ -396,7 +392,7 @@ const Chatbot = () => {
               <ChatbotEscalation
                 changeChatbotTab={changeChatbotTab}
                 user={userData}
-                // chatbot={chatbot}
+              // chatbot={chatbot}
               />
             )}
             {chatbotTab === 7 && (
