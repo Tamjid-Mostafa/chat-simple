@@ -112,7 +112,7 @@ const FAQ = ({ changeChatbotTab, chatbotTitle, setExpertises, expertiseLength })
             }
         }
     }, [expertiseLength, chatbot]);
-    console.log(expertiseLength)
+    // console.log(expertiseLength)
 
 
     const buildFaq = async () => {
