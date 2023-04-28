@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import MessengerImage from '../../assets/images/svg/messenger.svg';
 import { Switch } from '@mui/material';
 import displayimg from '../../assets/chatbotcardpic.png';
 
-const BootCard = ({ changeChatbotTab, bot, setChatbotTitle, setChatbotID, handleDelete }) => {
+const BootCard = ({ changeChatbotTab, bot, setChatbotTitle, setChatbotID, handleDelete,setExpertiseLength }) => {
 
 
   const edit = () => {
     changeChatbotTab(3)
     setChatbotTitle(bot?.chatbot_title)
     setChatbotID(bot?.chatbot_id)
+    setExpertiseLength(types.length)
   }
 
   const types = [];
@@ -31,6 +32,9 @@ const BootCard = ({ changeChatbotTab, bot, setChatbotTitle, setChatbotID, handle
         types.push(expertise.name)
     );
   });
+
+
+  
 
   return (
     <>

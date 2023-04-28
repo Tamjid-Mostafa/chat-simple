@@ -48,12 +48,12 @@ import { get, put } from '../../network';
 
 
 
-const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
+const FAQ = ({ changeChatbotTab, chatbotTitle, setExpertises, expertiseLength }) => {
     const { chatbot } = useSelector((state) => state.chatbot)
     const { user } = useSelector((state) => state.user);
     const [isTrue, setIsTrue] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [expertiseId, setExpertiseId] = useState("");
+    const [expertiseId, setExpertiseId] = useState();
     const [url, setUrl] = useState('');
 
     const [data, setData] = useState([])
@@ -74,21 +74,45 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
         }
     }, [data]);
 
+
     useEffect(() => {
-        const FAQExpertise = chatbot?.expertises.find(expertise => expertise.expertise_type === "ExpertiseType.FAQ");
-        if (FAQExpertise) {
-            setLoading(true);
-            get(
-                `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${FAQExpertise.chatbot_expertise_id}`,
-            ).then((response) => {
-                const { form_information, chatbot_expertise_id } = response.data;
-                setRows(form_information.faqs)
-                setExpertiseId(chatbot_expertise_id);
-                setLoading(false);
-                
-            });
+        if (expertiseLength === 0) return;
+        if (expertiseLength > 0) {
+            const updatedExpertises = chatbot.expertises.reduce((acc, expertise) => {
+                if (expertise.expertise_type === 'ExpertiseType.FAQ') {
+                    return [...acc, 3];
+                } else if (expertise.expertise_type === 'ExpertiseType.BUSINESS_SMALL_TALK') {
+                    return [...acc, 4];
+                } else if (expertise.expertise_type === 'ExpertiseType.FREE_FORM') {
+                    return [...acc, 5];
+                }
+                return acc;
+            }, []);
+
+            setExpertises(updatedExpertises);
         }
-    }, [chatbot]);
+    }, [expertiseId]);
+
+    useEffect(() => {
+        if (expertiseLength > 0) {
+            const FAQExpertise = chatbot?.expertises.find(expertise => expertise.expertise_type === "ExpertiseType.FAQ");
+            if (FAQExpertise) {
+                setLoading(true);
+                get(
+                    `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/${FAQExpertise.chatbot_expertise_id}`,
+                ).then((response) => {
+                    const { form_information, chatbot_expertise_id } = response.data;
+                    setRows(form_information.faqs)
+                    setExpertiseId(chatbot_expertise_id);
+                    setLoading(false);
+                    console.log(response.data)
+                }).catch((error) => {
+                    console.error(error.message);
+                })
+            }
+        }
+    }, [expertiseLength, chatbot]);
+    console.log(expertiseLength)
 
 
     const buildFaq = async () => {
@@ -152,7 +176,7 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
             showSnackbar(e.message, 'error')
         }
     };
-    
+
     const generateFaq = async () => {
         setLoading(true)
         try {
@@ -160,13 +184,13 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
                 'x-access-token': 'skip_validation_for_admin',
                 'Content-Type': 'application/json',
             };
-    
+
             const response = await axios.post(
                 `https://api.chatsimple.ai/v0/users/${user.user_id}/chatbot_expertises/extractfaq`,
                 { url: url },
                 { headers }
             );
-    
+
             setData(response.data);
             setIsTrue(true);
             setLoading(false)
@@ -175,7 +199,7 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
             showSnackbar(error.message, 'error');
         }
     };
-    
+
     const handleCellChange = useCallback((id, field, value) => {
         setRows((prevRows) =>
             prevRows.map((row) => {
@@ -186,14 +210,14 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
             })
         );
     }, []);
-    
+
     const handleCellChangeWithParams = useCallback((id, field) => {
         return (event) => {
             handleCellChange(id, field, event.target.value);
         };
     }, [handleCellChange]);
-    
-   
+
+
 
 
     const columns = [
@@ -254,7 +278,7 @@ const FAQ = ({ changeChatbotTab, chatbotTitle }) => {
             ),
         },
     ];
-    
+
 
     return (
         <div className='px-5'>

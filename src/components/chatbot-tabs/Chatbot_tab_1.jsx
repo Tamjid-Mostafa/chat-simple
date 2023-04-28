@@ -10,7 +10,7 @@ import { useSnackbar } from '../ui/MySnackbar/useSnakeBar';
 
 // this file
 
-const Chatbot_tab_1 = ({ changeChatbotTab, setChatbotTitle, setChatbotID }) => {
+const Chatbot_tab_1 = ({ changeChatbotTab, setChatbotTitle, setChatbotID, setExpertiseLength }) => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
   const { chatbots, loading } = useSelector((state) => state.chatbot); // this has all the chat-bots list for a user that is logged in
@@ -78,6 +78,7 @@ const Chatbot_tab_1 = ({ changeChatbotTab, setChatbotTitle, setChatbotID }) => {
                         <BootCard
                           key={bot.chatbot_id}
                           bot={bot}
+                          setExpertiseLength={setExpertiseLength}
                           setChatbotTitle={setChatbotTitle} changeChatbotTab={changeChatbotTab}
                           setChatbotID={setChatbotID}
                           handleDelete={handleDelete}

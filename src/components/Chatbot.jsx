@@ -19,54 +19,9 @@ import FAQ from './FAQ/FAQ.';
 import { createChatbot, createChatBot, getChatbot, updateChatbot, updateChatBot } from '../redux/reducers/chatbotSlice';
 import { useSnackbar } from './ui/MySnackbar/useSnakeBar';
 
-const listItemsData =
-{
-  channels: [
-    {
-      name: 'Messenger',
-      img: messenger,
-      slug: 'messenger'
-    },
-    {
-      name: 'Instagram',
-      img: instagram,
-      slug: 'instagram'
-    },
-  ],
-  chatBotExpertise: [
-    {
-      id: 3,
-      name: 'FAQs',
-    },
-    {
-      id: 4,
-      name: 'Company Specific Talk',
-    },
-    {
-      id: 5,
-      name: 'Industry Expert',
-    },
-    {
-      id: 6,
-      name: 'Escalation',
-    },
-  ],
-
-}
-
-
 const Chatbot = () => {
   const { showSnackbar } = useSnackbar();
   const [chatbotTab, setChatbotTab] = React.useState(1);
-  const [isChecked, setIsChecked] = useState(false)
-
-
-  const [isTyping, setIsTyping] = useState(false);
-  const [chatbotTitle, setChatbotTitle] = useState('');
-  const [chatbotID, setChatbotID] = useState(null);
-
-  const [platforms, setPlatforms] = useState([]);
-  const [expertises, setExpertises] = useState([]);
   const { loading, user: userData } = useSelector((state) => {
     return state.auth;
   });
@@ -89,18 +44,30 @@ const Chatbot = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
   const { chatbots } = useSelector((state) => state.chatbot); // this has all the chat-bots list for a user that is logged in
+  
+
+  
+
+  const [isChecked, setIsChecked] = useState(false)
+  const [expertiseLength, setExpertiseLength] = useState(null)
+// console.log(expertiseLength)
+
+  const [isTyping, setIsTyping] = useState(false);
+  const [chatbotTitle, setChatbotTitle] = useState('');
+  const [prevTitle, setPrevTitle] = useState('');
+  const [chatbotID, setChatbotID] = useState('');
+  const [isChatbot, setISChatbot] = useState();
+
+  const [platforms, setPlatforms] = useState([]);
+  const [expertises, setExpertises] = useState([]);
 
 
-
-
-
-
-  // useEffect(() => {
-  //   if (!chatbotID || chatbotID === "" || !user.user_id) return;
-  //   if (chatbotID && user.user_id) {
-  //     dispatch(getChatbot({ userID: user.user_id, chatbotID }));
-  //   }
-  // }, [chatbotID, user.user_id]);
+  useEffect(() => {
+    if (!chatbotID || chatbotID === "" || !user.user_id) return;
+    if (chatbotID && user.user_id) {
+      dispatch(getChatbot({ userID: user.user_id, chatbotID }));
+    }
+  }, [chatbotID, user.user_id]);
 
   // const [chatbot, setChatbot] = useState({})
 
@@ -109,16 +76,17 @@ const Chatbot = () => {
   // }, [chatbotTitle])
 
   // const { chatbot } = useSelector((state) => state.chatbot)
+  // console.log(chatbot?.expertises?.length)
   // useEffect(() => {
-  //   if (!chatbotID || chatbotID === "" || !user.user_id) return;
+  //   if (!chatbotID || chatbotID === "" || !user.user_id && chatbot) return;
   //   if (chatbotID && user.user_id) {
   //     setISChatbot(chatbot)
   //   }
-  // }, [chatbotID, user.user_id]);
+  // }, [chatbotID, user.user_id, chatbot]);
 
 
-  // useEffect(() => {
-  //   // if (!chatbotID || chatbotID === "" || !user.user_id) return;
+  //  useEffect(() => {
+  //   if (!chatbotID || chatbotID === "" || !user.user_id && chatbot?.expertises?.length === 0) return;
   //   if (isChatbot && isChatbot.expertises && isChatbot.expertises.length > 0) {
   //     const updatedExpertises = isChatbot.expertises.reduce((acc, expertise) => {
   //       if (expertise.expertise_type === 'ExpertiseType.FAQ') {
@@ -130,16 +98,54 @@ const Chatbot = () => {
   //       }
   //       return acc;
   //     }, []);
-
+  
   //     setExpertises(updatedExpertises);
   //   }
-  // }, [isChatbot]);
-
-  // console.log(isChatbot)
+  // }, [chatbotID, user.user_id, isChatbot]);
 
 
 
 
+
+
+  const listItemsData =
+  {
+    channels: [
+      {
+        name: 'Messenger',
+        img: messenger,
+        slug: 'messenger'
+      },
+      {
+        name: 'Instagram',
+        img: instagram,
+        slug: 'instagram'
+      },
+    ],
+    chatBotExpertise: [
+      {
+        id: 3,
+        name: 'FAQs',
+        checked: isChecked,
+      },
+      {
+        id: 4,
+        name: 'Company Specific Talk',
+        checked: isChecked,
+      },
+      {
+        id: 5,
+        name: 'Industry Expert',
+        checked: isChecked,
+      },
+      {
+        id: 6,
+        name: 'Escalation',
+        checked: isChecked,
+      },
+    ],
+
+  }
 
 
   const CreateChatbot = () => {
@@ -163,6 +169,7 @@ const Chatbot = () => {
   }
 
   const UpdateChatbot = () => {
+    setPrevTitle(chatbotTitle);
     // update here
     const data = {
       userID: user?.user_id,
@@ -256,6 +263,7 @@ const Chatbot = () => {
       <div className='w-full relative'>
         {chatbotTab === 1 && (
           <Chatbot_tab_1
+          setExpertiseLength={setExpertiseLength}
             changeChatbotTab={changeChatbotTab}
             user={userData}
             setChatbotTitle={setChatbotTitle}
@@ -364,6 +372,8 @@ const Chatbot = () => {
             )}
             {chatbotTab === 3 && (
               <FAQ
+              setExpertises={setExpertises}
+              expertiseLength={expertiseLength}
                 changeChatbotTab={changeChatbotTab}
                 user={userData}
                 chatbotID={chatbotID}
@@ -392,7 +402,7 @@ const Chatbot = () => {
               <ChatbotEscalation
                 changeChatbotTab={changeChatbotTab}
                 user={userData}
-              // chatbot={chatbot}
+                // chatbot={chatbot}
               />
             )}
             {chatbotTab === 7 && (
